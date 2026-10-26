@@ -183,8 +183,77 @@
         </div>
       </div>
 
+      <!-- 🎯 1. ส่วน Header แสดงข้อความจำนวนข้อมูลแบบ Dynamic -->
+      <div class="text-center mb-4 mt-2">
+        <h4 id="mainDataHeader" class="fw-bold mb-0" style="color: var(--cra-text-main);">
+          กำลังโหลดข้อมูล...
+        </h4>
+      </div>
+
+      <!-- 🎯 2. ย้ายตัวกรองทั้งหมดมารวมกันไว้ด้านบนสุด (ปรับ UI ใหม่ให้พรีเมียมตามแบบ) -->
+      <div class="cra-card mb-4" style="padding: 20px 24px;">
+        
+        <!-- แถวบน: ค้นหา, Export และ Global Filter -->
+        <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3 mb-3">
+          
+          <!-- ฝั่งซ้าย: ค้นหา + Export -->
+          <div class="d-flex flex-column flex-md-row gap-2">
+            <div class="input-group search-group" style="width: 300px; max-width: 100%;">
+              <span class="input-group-text bg-white border-end-0 ps-3">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" id="customSearch" class="form-control filter-box border-start-0 ps-2 m-0 shadow-none" placeholder="ค้นหาทั่วไป..." style="border-radius: 0 12px 12px 0;">
+            </div>
+            
+            <button class="btn btn-export" onclick="exportDataToExcel()" style="background-color: #10b981; min-width: 140px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              Export Excel
+            </button>
+          </div>
+
+          <!-- ฝั่งขวา: Global Filter (ไตรมาส / เดือน) -->
+          <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
+            <span class="text-muted small fw-bold d-flex align-items-center gap-1 me-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--cra-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+              กรองข้อมูลภาพรวม (Global Filter)
+            </span>
+            <select id="filterQuarter" class="form-select fw-bold border shadow-sm w-auto filter-box" style="color: var(--cra-blue); background-color: #f8fafc; border-radius: 12px;">
+              <option value="">-- ทุกไตรมาส --</option>
+            </select>
+            <select id="filterMonth" class="form-select fw-bold border shadow-sm w-auto filter-box" style="color: var(--cra-orange); background-color: #f8fafc; border-radius: 12px;">
+              <option value="">-- ทุกเดือน --</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- แถวล่าง: หมวดหมู่, ประเภท และสวิตช์พระกรณียกิจ -->
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+          
+          <select id="filterCategory" class="filter-box" style="width: 240px; max-width: 100%;">
+            <option value="">- หมวดหมู่ข่าว -</option>
+          </select>
+
+          <div class="dropdown type-dropdown" style="width: 240px; max-width: 100%;">
+            <button class="btn w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" style="background: #f8fafc;">
+              <span id="filterTypeBtnText" class="text-truncate">- ประเภทข่าว -</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <ul class="dropdown-menu border-0" id="filterTypeList" style="max-height: 300px; overflow-y: auto;">
+              <li><div class="px-3 py-4 text-muted text-center small">กำลังโหลด...</div></li>
+            </ul>
+          </div>
+
+          <div class="form-check form-switch d-flex align-items-center mb-0 ms-md-2 mt-2 mt-md-0">
+            <input class="form-check-input" type="checkbox" id="filterSpecial" value="พระกรณียกิจ" style="width: 2.8em; height: 1.4em;">
+            <label class="form-check-label fw-bold ms-2" for="filterSpecial" style="color: var(--cra-text-main); cursor: pointer; padding-top: 2px;">ข่าวพระกรณียกิจ</label>
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- 🎯 3. การ์ดสรุปตัวเลข (ปรับให้แสดง 2 คอลัมน์กว้างๆ) -->
       <div class="row mb-4 g-4 align-items-stretch">
-        <div class="col-xl-5 col-lg-6">
+        <div class="col-md-6">
           <div class="cra-card h-100 d-flex flex-column justify-content-center align-items-start" style="border-left: 6px solid var(--cra-blue); padding: 20px 30px;">
             <div class="d-flex align-items-center">
               <div class="menu-icon-box mb-0 me-3" style="width: 56px; height: 56px; font-size: 24px; background: rgba(29, 43, 83, 0.1); color: var(--cra-blue); border-radius: 14px; display: flex; justify-content: center; align-items: center;">
@@ -198,25 +267,11 @@
           </div>
         </div>
 
-        <div class="col-xl-3 col-lg-6">
+        <div class="col-md-6">
           <div class="cra-card h-100 d-flex flex-column justify-content-center align-items-start" style="border-left: 6px solid #10b981; padding: 20px 30px;">
             <p class="text-muted small fw-bold mb-1">จำนวนข่าวทั้งหมด</p>
             <div class="fw-bold text-dark d-flex align-items-baseline gap-2" style="font-size: 2.2rem; line-height: 1.1;">
               <span id="totalNews">-</span> <span style="font-size: 1rem; color: var(--cra-text-muted); font-weight: 400;">รายการ</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-xl-4 col-lg-12">
-          <div class="cra-card h-100 d-flex flex-column justify-content-center bg-light border-0">
-            <span class="text-muted small fw-bold d-block mb-3"><i class="bi bi-funnel-fill" style="color: var(--cra-blue);"></i> กรองข้อมูลภาพรวม (Global Filter)</span>
-            <div class="d-flex gap-2">
-              <select id="filterQuarter" class="form-select fw-bold border-0 shadow-sm" style="color: var(--cra-blue); background-color: #ffffff; cursor: pointer;">
-                <option value="">-- ทุกไตรมาส --</option>
-              </select>
-              <select id="filterMonth" class="form-select fw-bold border-0 shadow-sm" style="color: var(--cra-orange); background-color: #ffffff; cursor: pointer;">
-                <option value="">-- ทุกเดือน --</option>
-              </select>
             </div>
           </div>
         </div>
@@ -256,42 +311,12 @@
         </div>
       </div>
 
+      <!-- 🎯 4. ปรับส่วนหัวของตารางฐานข้อมูลให้คลีนขึ้น (ลบตัวกรองออก) -->
       <div class="cra-card">
-        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
-          <h5 class="fw-bold mb-0" style="color: var(--cra-blue); white-space: nowrap;">
+        <div class="mb-4">
+          <h5 class="fw-bold mb-0" style="color: var(--cra-blue);">
             <i class="bi bi-database-fill me-2" style="color: var(--cra-orange);"></i> ฐานข้อมูลสื่อ
           </h5>
-          
-          <div class="d-flex flex-wrap gap-2 justify-content-lg-end align-items-center">
-            
-            <div class="form-check form-switch d-flex align-items-center me-lg-2 mb-0">
-              <input class="form-check-input" type="checkbox" id="filterSpecial" value="พระกรณียกิจ">
-              <label class="form-check-label fw-bold ms-2" for="filterSpecial" style="color: var(--cra-blue); cursor: pointer; padding-top: 3px;">ข่าวพระกรณียกิจ</label>
-            </div>
-
-            <select id="filterCategory" class="filter-box">
-              <option value="">- หมวดหมู่ข่าว -</option>
-            </select>
-            
-            <div class="dropdown type-dropdown">
-              <button class="btn w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                <span id="filterTypeBtnText" class="text-truncate">- ประเภทข่าว -</span>
-                <i class="bi bi-chevron-down ms-2" style="font-size: 0.8rem; color: #94a3b8;"></i>
-              </button>
-              <ul class="dropdown-menu border-0" id="filterTypeList" style="max-height: 300px; overflow-y: auto;">
-                <li><div class="px-3 py-4 text-muted text-center small">กำลังโหลด...</div></li>
-              </ul>
-            </div>
-            
-            <div class="input-group search-group">
-              <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-              <input type="text" id="customSearch" class="form-control filter-box border-start-0 ps-0 m-0" placeholder="ค้นหาทั่วไป...">
-            </div>
-
-            <button class="btn btn-export ms-lg-2" onclick="exportDataToExcel()">
-              <i class="bi bi-file-earmark-excel-fill"></i> Export Excel
-            </button>
-          </div>
         </div>
         <div class="table-responsive">
           <table id="dataTable" class="cra-table">
@@ -439,6 +464,17 @@
             datatableInstance.column(6).search(currentTypes.length > 0 ? '^(' + currentTypes.map(s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|') + ')$' : '', true, false); 
             datatableInstance.search(sFilter).draw();
         }
+
+        // 🎯 5. เพิ่มการคำนวณและอัปเดตข้อความ Header จำนวนข้อมูลแบบ Dynamic
+        let isFiltered = (qFilter || mFilter || currentCat || currentTypes.length > 0 || isSpecialChecked || sFilter);
+        let headerHtml = '';
+        if (isFiltered) {
+            let searchText = sFilter ? ` "<span class="text-dark">${$('#customSearch').val()}</span>"` : '';
+            headerHtml = `ชุดข้อมูลที่ท่านค้นหา${searchText} มีทั้งหมด <span style="font-size: 1.4em; color: var(--cra-orange); margin: 0 4px;">${finalFiltered.length}</span> ข่าว`;
+        } else {
+            headerHtml = `ชุดข้อมูลข่าวประชาสัมพันธ์ CRA ทั้งหมด <span style="font-size: 1.4em; color: var(--cra-blue); margin: 0 4px;">${globalData.length}</span> ข่าว`;
+        }
+        $('#mainDataHeader').html(headerHtml);
       }
 
       // 🚀 ฟังก์ชันหลักสำหรับ Render ข้อมูลลงตาราง (แยกออกมาเพื่อให้เรียกใช้ได้ 2 ที่: จาก Cache และ จาก API)
@@ -474,23 +510,51 @@
         [...quartersForFilter].sort().forEach(q => $('#filterQuarter').append(new Option("ไตรมาส: " + q, q)));
         [...monthsForFilter].sort().forEach(m => $('#filterMonth').append(new Option("เดือน: " + m.substring(3), m)));
 
-        if(datatableInstance) { datatableInstance.destroy(); }
-        $('#dataTable tbody').html(tbody);
+        if (datatableInstance) {
+            datatableInstance.destroy();
+        }
         
+        $('#dataTable tbody').html(tbody);
         $.fn.DataTable.ext.pager.numbers_length = 5;
+
         datatableInstance = $('#dataTable').DataTable({ 
           "dom": 't<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-4"i<"d-flex flex-column flex-md-row align-items-center gap-2"p<"jump-to-page">>>',
-          "pageLength": 10, "language": { "emptyTable": "ไม่พบข้อมูล", "info": "แสดงรายการ _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ", "paginate": { "next": "<b>&gt;</b>", "previous": "<b>&lt;</b>" } } 
+          "pageLength": 10, 
+          "language": { 
+            "emptyTable": "ไม่พบข้อมูล", 
+            "info": "แสดงรายการ _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ", 
+            "paginate": { "next": "<b>&gt;</b>", "previous": "<b>&lt;</b>" } 
+          } 
         });
 
-        $("div.jump-to-page").html(`<div class="d-flex align-items-center justify-content-center mt-2 mt-md-0 ms-md-2"><span class="text-muted me-2" style="font-size: 0.8rem;">หน้า:</span><input type="number" id="jumpInput" class="form-control text-center shadow-sm px-1" style="width: 55px; height: 32px; border-radius: 8px; font-size: 0.85rem; border: 1px solid #cbd5e1;" min="1"></div>`); 
-        $('#jumpInput').on('change', function() { let target = parseInt($(this).val(), 10); if (target >= 1 && target <= datatableInstance.page.info().pages) { datatableInstance.page(target - 1).draw('page'); } else { $(this).val(datatableInstance.page.info().page + 1); } });
-        datatableInstance.on('draw', function() { let info = datatableInstance.page.info(); $('#jumpInput').val(info.page + 1).attr('max', info.pages); });
+        let jumpHtml = `
+          <div class="d-flex align-items-center justify-content-center mt-2 mt-md-0 ms-md-2">
+            <span class="text-muted me-2" style="font-size: 0.8rem;">หน้า:</span>
+            <input type="number" id="jumpInput" class="form-control text-center shadow-sm px-1" style="width: 55px; height: 32px; border-radius: 8px; font-size: 0.85rem; border: 1px solid #cbd5e1;" min="1">
+          </div>
+        `;
+        $("div.jump-to-page").html(jumpHtml); 
 
+        $('#jumpInput').on('change', function() {
+          let targetPage = parseInt($(this).val(), 10); 
+          let maxPage = datatableInstance.page.info().pages; 
+          if (targetPage >= 1 && targetPage <= maxPage) {
+            datatableInstance.page(targetPage - 1).draw('page'); 
+          } else {
+            $(this).val(datatableInstance.page.info().page + 1); 
+          }
+        });
+
+        datatableInstance.on('draw', function() {
+          let info = datatableInstance.page.info();
+          $('#jumpInput').val(info.page + 1).attr('max', info.pages);
+        });
+
+        // Trigger filters update after table is built
         updateDashboardWidgets(true);
       }
-
-      $(document).ready(function() {
+    
+    $(document).ready(function() {
         // อนิเมชั่นหลอกๆ สำหรับหน้าโหลดดิ้ง
         let progress = 15;
         let progressInterval = setInterval(() => { if(progress < 90) { progress += Math.floor(Math.random() * 5)+2; $('#progressBar').css('width', progress + '%'); $('#progressText').text(progress); } }, 150); 
