@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- 🎯 เพิ่มไลบรารี SheetJS สำหรับการสร้างไฟล์ Excel (Export) -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
     <style>
@@ -144,34 +143,18 @@
       .pagination { flex-wrap: wrap; justify-content: center; gap: 2px;}
       .page-item.active .page-link { background-color: var(--cra-blue); border-color: var(--cra-blue); padding: 6px 10px;}
 
-      /* ปุ่ม Export Excel */
-      .btn-export {
-        background-color: #10b981;
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 10px 16px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
-        transition: 0.3s;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        white-space: nowrap;
-      }
-      .btn-export:hover {
-        background-color: #059669;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
-        color: white;
-      }
+      .btn-export { background-color: #10b981; color: white; border: none; border-radius: 12px; padding: 10px 16px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2); transition: 0.3s; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+      .btn-export:hover { background-color: #059669; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3); color: white; }
 
       #loader-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
       .loader-logo { font-size: 1.5rem; font-weight: 800; color: var(--cra-blue); margin-bottom: 20px; text-align: center;}
       .progress-container { width: 250px; height: 8px; background-color: #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 15px;}
       .progress-bar-fill { height: 100%; background-color: var(--cra-blue); width: 0%; transition: width 0.3s; }
       .loader-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+      
+      /* แจ้งเตือนเมื่อข้อมูลเบื้องหลังอัปเดตเสร็จ */
+      #update-toast { position: fixed; bottom: 20px; right: 20px; background-color: #1d2b53; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 9999; transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); pointer-events: none; }
+      #update-toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
 
       @media (max-width: 768px) {
         .type-dropdown, select.filter-box, .search-group { width: 100% !important; margin-bottom: 5px; }
@@ -185,8 +168,10 @@
     <div id="loader-wrapper">
       <div class="loader-logo">CRA News Dashboard 2027 <br>ข่าวประชาสัมพันธ์ CRA</div>
       <div class="progress-container"><div class="progress-bar-fill" id="progressBar"></div></div>
-      <div class="progress-text">กำลังดึงข้อมูลและอัปเดตแคช... <span id="progressText" style="color: var(--cra-blue); font-weight: 700;">0</span>%</div>
+      <div class="progress-text">กำลังดึงข้อมูล... <span id="progressText" style="color: var(--cra-blue); font-weight: 700;">0</span>%</div>
     </div>
+    
+    <div id="update-toast">✅ อัปเดตข้อมูลล่าสุดเรียบร้อยแล้ว <a href="#" onclick="location.reload();" style="color: #60a5fa; margin-left: 10px;">รีเฟรชหน้าเว็บ</a></div>
 
     <div class="container-fluid py-4 px-md-5">
       
@@ -303,7 +288,6 @@
               <input type="text" id="customSearch" class="form-control filter-box border-start-0 ps-0 m-0" placeholder="ค้นหาทั่วไป...">
             </div>
 
-            <!-- 🎯 ปุ่ม Export Excel -->
             <button class="btn btn-export ms-lg-2" onclick="exportDataToExcel()">
               <i class="bi bi-file-earmark-excel-fill"></i> Export Excel
             </button>
@@ -320,8 +304,8 @@
                 <th style="width: 15%;">หมวดหมู่ข่าว</th>
                 <th class="text-end pe-4" style="width: 12%;">PR Value</th>
                 <th style="width: 15%;">ประเภท</th>
-                <th>แหล่งข่าว</th>
-                <th>สื่อที่เผยแพร่</th>
+                <th style="width: 15%;">แหล่งข่าว</th>
+                <th style="width: 15%;">สื่อที่เผยแพร่</th>
                 <th style="display:none;">Quarter</th>
                 <th style="display:none;">Month</th>
                 <th style="display:none;">SpecialCategory</th>
@@ -341,392 +325,231 @@
     
     <script>
       const API_URL = "https://script.google.com/macros/s/AKfycbwqN-9Yhsu9me5F3UxBCiG9HaRSQpxPuRpkHeQOt7KwB6u_0H_wx63nozGCAg7GOJ_L-Q/exec";
+      // 🚀 CACHE CONFIGURATION
+      const CACHE_KEY = "cra_news_cache_freemedia";
       
       const chartColors = ['#1d2b53', '#ea580c', '#eab308', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b', '#0ea5e9', '#f43f5e', '#14b8a6', '#84cc16', '#d946ef', '#f97316', '#06b6d4'];
       let globalData = []; 
-      let currentFilteredData = []; // 🎯 ตัวแปรเก็บข้อมูลที่ถูกฟิลเตอร์แล้ว สำหรับ Export
+      let currentFilteredData = [];
       let chartInstances = {};
+      let datatableInstance = null;
 
-      // 🎯 ฟังก์ชันสำหรับ Export ข้อมูลที่ผ่านการกรองแล้วเป็น Excel
       function exportDataToExcel() {
-        if (currentFilteredData.length === 0) {
-          alert("ไม่มีข้อมูลสำหรับดาวน์โหลด กรุณาปรับเงื่อนไขการค้นหาใหม่");
-          return;
-        }
-
-        // 1. จัดเตรียมโครงสร้างข้อมูลให้สวยงามสำหรับ Excel
+        if (currentFilteredData.length === 0) { alert("ไม่มีข้อมูลสำหรับดาวน์โหลด"); return; }
         const excelData = currentFilteredData.map((item, index) => {
-          return {
-            "ลำดับ": index + 1,
-            "วันที่เผยแพร่": item.date,
-            "โครงการที่เผยแพร่": item.project_raw,
-            "URL อ้างอิง": item.url || "ไม่มี",
-            "ข่าวพระกรณียกิจ": item.special.includes("พระกรณียกิจ") ? "ใช่" : "-",
-            "หมวดหมู่ข่าว": item.category,
-            "ประเภท": item.type,
-            "แหล่งข่าว": item.source,
-            "สื่อที่เผยแพร่": item.media,
-            "PR Value (บาท)": item.prValue,
-            "ไตรมาส": item.quarter,
-            "เดือน": item.month
-          };
+          return { "ลำดับ": index + 1, "วันที่เผยแพร่": item.date, "โครงการที่เผยแพร่": item.project_raw, "URL อ้างอิง": item.url || "-", "ข่าวพระกรณียกิจ": item.special.includes("พระกรณียกิจ") ? "ใช่" : "-", "หมวดหมู่ข่าว": item.category, "ประเภท": item.type, "แหล่งข่าว": item.source, "สื่อที่เผยแพร่": item.media, "PR Value (บาท)": item.prValue, "ไตรมาส": item.quarter, "เดือน": item.month };
         });
-
-        // 2. สร้าง Workbook และ Worksheet ผ่าน SheetJS
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Filtered_News_Data");
-
-        // 3. กำหนดชื่อไฟล์และสั่งดาวน์โหลด
-        let dateStr = new Date().toISOString().slice(0,10).replace(/-/g, "");
-        XLSX.writeFile(workbook, `CRA_News_Export_${dateStr}.xlsx`);
+        XLSX.utils.book_append_sheet(workbook, worksheet, "News_Data");
+        XLSX.writeFile(workbook, `CRA_News_Export_${new Date().toISOString().slice(0,10).replace(/-/g, "")}.xlsx`);
       }
 
       function getStandardMonth(dateStr) {
-        if(!dateStr) return "";
-        const str = String(dateStr).toLowerCase();
-        if(str.includes('มกราคม') || str.includes('ม.ค.') || str.includes('jan')) return "01-มกราคม";
-        if(str.includes('กุมภาพันธ์') || str.includes('ก.พ.') || str.includes('feb')) return "02-กุมภาพันธ์";
-        if(str.includes('มีนาคม') || str.includes('มี.ค.') || str.includes('mar')) return "03-มีนาคม";
-        if(str.includes('เมษายน') || str.includes('เม.ย.') || str.includes('apr')) return "04-เมษายน";
-        if(str.includes('พฤษภาคม') || str.includes('พ.ค.') || str.includes('may')) return "05-พฤษภาคม";
-        if(str.includes('มิถุนายน') || str.includes('มิ.ย.') || str.includes('jun')) return "06-มิถุนายน";
-        if(str.includes('กรกฎาคม') || str.includes('ก.ค.') || str.includes('jul')) return "07-กรกฎาคม";
-        if(str.includes('สิงหาคม') || str.includes('ส.ค.') || str.includes('aug')) return "08-สิงหาคม";
-        if(str.includes('กันยายน') || str.includes('ก.ย.') || str.includes('sep')) return "09-กันยายน";
-        if(str.includes('ตุลาคม') || str.includes('ต.ค.') || str.includes('oct')) return "10-ตุลาคม";
-        if(str.includes('พฤศจิกายน') || str.includes('พ.ย.') || str.includes('nov')) return "11-พฤศจิกายน";
-        if(str.includes('ธันวาคม') || str.includes('ธ.ค.') || str.includes('dec')) return "12-ธันวาคม";
-        return "";
+        if(!dateStr) return ""; const str = String(dateStr).toLowerCase();
+        if(str.includes('มกราคม') || str.includes('ม.ค.') || str.includes('jan')) return "01-มกราคม"; if(str.includes('กุมภาพันธ์') || str.includes('ก.พ.') || str.includes('feb')) return "02-กุมภาพันธ์"; if(str.includes('มีนาคม') || str.includes('มี.ค.') || str.includes('mar')) return "03-มีนาคม"; if(str.includes('เมษายน') || str.includes('เม.ย.') || str.includes('apr')) return "04-เมษายน"; if(str.includes('พฤษภาคม') || str.includes('พ.ค.') || str.includes('may')) return "05-พฤษภาคม"; if(str.includes('มิถุนายน') || str.includes('มิ.ย.') || str.includes('jun')) return "06-มิถุนายน"; if(str.includes('กรกฎาคม') || str.includes('ก.ค.') || str.includes('jul')) return "07-กรกฎาคม"; if(str.includes('สิงหาคม') || str.includes('ส.ค.') || str.includes('aug')) return "08-สิงหาคม"; if(str.includes('กันยายน') || str.includes('ก.ย.') || str.includes('sep')) return "09-กันยายน"; if(str.includes('ตุลาคม') || str.includes('ต.ค.') || str.includes('oct')) return "10-ตุลาคม"; if(str.includes('พฤศจิกายน') || str.includes('พ.ย.') || str.includes('nov')) return "11-พฤศจิกายน"; if(str.includes('ธันวาคม') || str.includes('ธ.ค.') || str.includes('dec')) return "12-ธันวาคม"; return "";
       }
 
       function formatThaiDate(rawDate) {
-        if (!rawDate) return "";
-        let str = String(rawDate).trim();
-        
+        if (!rawDate) return ""; let str = String(rawDate).trim();
         if (/[ก-๙]/.test(str)) { return str; }
-
         let d = new Date(str);
-        if (!isNaN(d.getTime())) {
-          let day = d.getDate();
-          let month = d.getMonth() + 1; 
-          let year = d.getFullYear();
-          let thaiYear = year < 2500 ? year + 543 : year;
-          const thaiMonths = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-          return `${day} ${thaiMonths[month]} ${thaiYear}`;
-        }
+        if (!isNaN(d.getTime())) { return `${d.getDate()} ${["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."][d.getMonth() + 1]} ${d.getFullYear() < 2500 ? d.getFullYear() + 543 : d.getFullYear()}`; }
         return str; 
       }
       
       function analyzeObj(dataArray, key) {
         let counts = {}; let total = 0;
-        dataArray.forEach(item => {
-          let val = item[key] ? item[key] : "ไม่ระบุ";
-          if(val === "") val = "ไม่ระบุ";
-          counts[val] = (counts[val] || 0) + 1;
-          total++;
-        });
-        let sorted = Object.keys(counts).map(k => ({ name: k, count: counts[k], percent: total > 0 ? ((counts[k]/total)*100).toFixed(2) : "0.00" })).sort((a,b) => b.count - a.count);
-        return { total: total, items: sorted };
+        dataArray.forEach(item => { let val = item[key] || "ไม่ระบุ"; if(val === "") val = "ไม่ระบุ"; counts[val] = (counts[val] || 0) + 1; total++; });
+        return { total: total, items: Object.keys(counts).map(k => ({ name: k, count: counts[k], percent: total > 0 ? ((counts[k]/total)*100).toFixed(2) : "0.00" })).sort((a,b) => b.count - a.count) };
       }
 
       function renderRankingList(containerId, dataObj, maxItems = 20) {
         let html = '';
         dataObj.items.slice(0, maxItems).forEach((item, index) => {
-          let rankNum = index + 1;
-          let rankHtml = (rankNum === 1) ? `<div class="rank-circle rank-1">1</div>` : (rankNum === 2) ? `<div class="rank-circle rank-2">2</div>` : (rankNum === 3) ? `<div class="rank-circle rank-3">3</div>` : `<div class="rank-text">#${rankNum}</div>`;
+          let rankHtml = (index === 0) ? `<div class="rank-circle rank-1">1</div>` : (index === 1) ? `<div class="rank-circle rank-2">2</div>` : (index === 2) ? `<div class="rank-circle rank-3">3</div>` : `<div class="rank-text">#${index+1}</div>`;
           html += `<div class="d-flex align-items-center justify-content-between summary-list-row"><div class="d-flex align-items-center w-75 pe-3"><div style="width: 50px; text-align: left;">${rankHtml}</div><div class="text-truncate" title="${item.name}">${item.name}</div></div><div class="d-flex align-items-center" style="width: 120px; justify-content: space-between;"><div class="fw-bold">${item.count}</div><div class="percent-badge">${item.percent}</div></div></div>`;
         });
-        if(dataObj.items.length === 0) html = '<div class="text-center py-4 text-muted">ไม่พบข้อมูลตามเงื่อนไขที่กรอง</div>';
-        $('#' + containerId).html(html);
+        $('#' + containerId).html(dataObj.items.length === 0 ? '<div class="text-center py-4 text-muted">ไม่พบข้อมูล</div>' : html);
       }
 
       function renderDonutChart(canvasId, legendId, totalId, dataObj) {
         if (chartInstances[canvasId]) { chartInstances[canvasId].destroy(); }
         $('#' + totalId).text(dataObj.total);
-        let labels = dataObj.items.map(i => i.name); let dataCounts = dataObj.items.map(i => i.count); let bgColors = labels.map((_, i) => chartColors[i % chartColors.length]);
+        if(dataObj.total === 0) { $('#' + legendId).html('<div class="text-center py-4 text-muted">ไม่มีข้อมูล</div>'); return; }
         
-        if(dataObj.total === 0) {
-           $('#' + legendId).html('<div class="text-center py-4 text-muted">ไม่มีข้อมูล</div>');
-           return;
-        }
-
+        let labels = dataObj.items.map(i => i.name); let dataCounts = dataObj.items.map(i => i.count); let bgColors = labels.map((_, i) => chartColors[i % chartColors.length]);
         chartInstances[canvasId] = new Chart(document.getElementById(canvasId), { type: 'doughnut', data: { labels: labels, datasets: [{ data: dataCounts, backgroundColor: bgColors, borderWidth: 0, hoverOffset: 4 }] }, options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return ` ${labels[c.dataIndex]}: ${dataCounts[c.dataIndex]} (${dataObj.items[c.dataIndex].percent}%)`; } } } } } });
         
         let legendHtml = '<div>';
         dataObj.items.forEach((item, index) => {
-          legendHtml += `
-            <div class="d-flex justify-content-between align-items-center legend-item">
-              <div class="d-flex align-items-center text-truncate pe-3 legend-text">
-                <span class="legend-color-dot" style="background-color:${bgColors[index]};"></span>
-                <span class="text-truncate" title="${item.name}">${item.name}</span>
-              </div>
-              <div class="d-flex align-items-center gap-3">
-                <span class="legend-count">${item.count}</span>
-                <span class="legend-percent">ร้อยละ ${item.percent}</span>
-              </div>
-            </div>`;
+          legendHtml += `<div class="d-flex justify-content-between align-items-center legend-item"><div class="d-flex align-items-center text-truncate pe-3 legend-text"><span class="legend-color-dot" style="background-color:${bgColors[index]};"></span><span class="text-truncate" title="${item.name}">${item.name}</span></div><div class="d-flex align-items-center gap-3"><span class="legend-count">${item.count}</span><span class="legend-percent">ร้อยละ ${item.percent}</span></div></div>`;
         });
         $('#' + legendId).html(legendHtml + '</div>');
       }
 
       function updateDashboardWidgets(rebuildDropdowns = true) {
-        let qFilter = $('#filterQuarter').val();
-        let mFilter = $('#filterMonth').val();
-        let isSpecialChecked = $('#filterSpecial').is(':checked'); 
-
-        let baseFilteredData = globalData.filter(item => {
-            if (qFilter && item.quarter !== qFilter) return false;
-            if (mFilter && item.month !== mFilter) return false;
-            if (isSpecialChecked && !item.special.includes("พระกรณียกิจ")) return false; 
-            return true;
-        });
-
+        let qFilter = $('#filterQuarter').val(), mFilter = $('#filterMonth').val(), isSpecialChecked = $('#filterSpecial').is(':checked'); 
+        let baseFilteredData = globalData.filter(item => (!qFilter || item.quarter === qFilter) && (!mFilter || item.month === mFilter) && (!isSpecialChecked || item.special.includes("พระกรณียกิจ")));
         let currentCat = $('#filterCategory').val();
         let currentTypes = $('.type-checkbox:checked').map(function() { return this.value; }).get();
 
         if (rebuildDropdowns) {
-            let availableCategories = new Set();
-            let availableTypes = new Set();
-            
-            baseFilteredData.forEach(item => {
-                availableCategories.add(item.category);
-                if (currentCat && item.category !== currentCat) return;
-                availableTypes.add(item.type);
-            });
+            let availableCats = new Set(), availableTypes = new Set();
+            baseFilteredData.forEach(item => { availableCats.add(item.category); if (!currentCat || item.category === currentCat) availableTypes.add(item.type); });
 
             $('#filterCategory').empty().append('<option value="">- หมวดหมู่ข่าว -</option>');
-            [...availableCategories].sort().forEach(c => $('#filterCategory').append(new Option(c, c)));
-            if(availableCategories.has(currentCat)) {
-                $('#filterCategory').val(currentCat);
-            } else {
-                currentCat = ""; 
-            }
+            [...availableCats].sort().forEach(c => $('#filterCategory').append(new Option(c, c)));
+            if(availableCats.has(currentCat)) $('#filterCategory').val(currentCat); else currentCat = ""; 
 
             let typeListHtml = '';
-            
             [...availableTypes].sort().forEach(t => {
                let isChecked = currentTypes.includes(t) ? 'checked' : '';
                let safeValue = String(t).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-               
-               typeListHtml += `
-                 <li>
-                   <label class="dropdown-item d-flex align-items-start custom-check-label">
-                     <input class="form-check-input type-checkbox me-3 flex-shrink-0" type="checkbox" value="${safeValue}" ${isChecked}>
-                     <span class="flex-grow-1" style="line-height: 1.4; color: #334155; font-size: 0.9rem;">${t}</span>
-                   </label>
-                 </li>
-               `;
+               typeListHtml += `<li><label class="dropdown-item d-flex align-items-start custom-check-label"><input class="form-check-input type-checkbox me-3 flex-shrink-0" type="checkbox" value="${safeValue}" ${isChecked}><span class="flex-grow-1" style="line-height: 1.4; color: #334155; font-size: 0.9rem;">${t}</span></label></li>`;
             });
-            
-            if (availableTypes.size === 0) {
-                typeListHtml = '<li><div class="px-3 py-4 text-muted text-center small">ไม่พบประเภทข่าว</div></li>';
-            }
-
-            $('#filterTypeList').html(typeListHtml);
+            $('#filterTypeList').html(availableTypes.size === 0 ? '<li><div class="px-3 py-4 text-muted text-center small">ไม่พบประเภทข่าว</div></li>' : typeListHtml);
         }
         
-        if(currentTypes.length === 0) {
-           $('#filterTypeBtnText').text('- ประเภทข่าว -').css({'color':'var(--cra-text-main)', 'font-weight':'normal'});
-        } else {
-           $('#filterTypeBtnText').text(`- เลือกแล้ว (${currentTypes.length}) -`).css({'color':'var(--cra-blue)', 'font-weight':'700'});
-        }
+        $('#filterTypeBtnText').text(currentTypes.length === 0 ? '- ประเภทข่าว -' : `- เลือกแล้ว (${currentTypes.length}) -`).css({'color': currentTypes.length === 0 ? 'var(--cra-text-main)' : 'var(--cra-blue)', 'font-weight': currentTypes.length === 0 ? 'normal' : '700'});
 
         let sFilter = $('#customSearch').val().toLowerCase();
-
         let finalFiltered = baseFilteredData.filter(item => {
             if (currentCat && item.category !== currentCat) return false;
             if (currentTypes.length > 0 && !currentTypes.includes(item.type)) return false;
-            if (sFilter) {
-                let textToSearch = `${item.date} ${item.project_raw} ${item.category} ${item.type} ${item.source} ${item.media}`.toLowerCase();
-                if (!textToSearch.includes(sFilter)) return false;
-            }
+            if (sFilter && !`${item.date} ${item.project_raw} ${item.category} ${item.type} ${item.source} ${item.media}`.toLowerCase().includes(sFilter)) return false;
             return true;
         });
 
-        // 🎯 อัปเดตตัวแปรสำหรับปุ่ม Export
         currentFilteredData = finalFiltered;
-
-        let sumPr = finalFiltered.reduce((sum, item) => sum + item.prValue, 0);
-        $('#sumPR').text(sumPr.toLocaleString('th-TH', {maximumFractionDigits:0}));
+        $('#sumPR').text(finalFiltered.reduce((sum, item) => sum + item.prValue, 0).toLocaleString('th-TH', {maximumFractionDigits:0}));
         $('#totalNews').text(finalFiltered.length);
-
-        let statusText = (qFilter || mFilter || currentCat || currentTypes.length > 0 || isSpecialChecked || sFilter) ? "เฉพาะข้อมูลที่กรอง" : "รวมทั้งหมด";
-        $('#badgeCategory, #badgeType').text(statusText);
+        $('#badgeCategory, #badgeType').text((qFilter || mFilter || currentCat || currentTypes.length > 0 || isSpecialChecked || sFilter) ? "เฉพาะข้อมูลที่กรอง" : "รวมทั้งหมด");
 
         renderDonutChart('categoryChart', 'categoryLegend', 'categoryTotal', analyzeObj(finalFiltered, 'category'));
         renderDonutChart('typeChart', 'typeLegend', 'typeTotal', analyzeObj(finalFiltered, 'type'));
         renderRankingList('mediaRankingList', analyzeObj(finalFiltered, 'media'), 20); 
         renderRankingList('sourceRankingList', analyzeObj(finalFiltered, 'source'), 20);
 
-        let table = $('#dataTable').DataTable();
-        
-        table.column(9).search(qFilter); 
-        table.column(10).search(mFilter); 
-        table.column(11).search(isSpecialChecked ? "พระกรณียกิจ" : ""); 
-        table.column(4).search(currentCat); 
-        
-        if (currentTypes.length > 0) {
-            let escapeRegex = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-            let regexPattern = '^(' + currentTypes.map(escapeRegex).join('|') + ')$';
-            table.column(6).search(regexPattern, true, false); 
-        } else {
-            table.column(6).search(''); 
+        if(datatableInstance) {
+            datatableInstance.column(9).search(qFilter); 
+            datatableInstance.column(10).search(mFilter); 
+            datatableInstance.column(11).search(isSpecialChecked ? "พระกรณียกิจ" : ""); 
+            datatableInstance.column(4).search(currentCat); 
+            datatableInstance.column(6).search(currentTypes.length > 0 ? '^(' + currentTypes.map(s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|') + ')$' : '', true, false); 
+            datatableInstance.search(sFilter).draw();
         }
-        
-        table.search(sFilter).draw();
       }
-      
-      $(document).ready(function() {
-        let progress = 15;
-        let progressInterval = setInterval(function() {
-          if (progress < 90) {
-            progress += Math.floor(Math.random() * 5) + 2;
-            if (progress > 90) progress = 90;
-            $('#progressBar').css('width', progress + '%'); $('#progressText').text(progress);
-          }
-        }, 150); 
 
-        function finishLoading() {
-          clearInterval(progressInterval);
-          $('#progressBar').css('width', '100%'); $('#progressText').text('100');
-          setTimeout(function() { $('#loader-wrapper').addClass('loader-hidden'); }, 500); 
+      // 🚀 ฟังก์ชันหลักสำหรับ Render ข้อมูลลงตาราง (แยกออกมาเพื่อให้เรียกใช้ได้ 2 ที่: จาก Cache และ จาก API)
+      function buildApplication(dataArray) {
+        let tbody = '';
+        let quartersForFilter = new Set(), monthsForFilter = new Set();
+        globalData = []; // Reset
+        
+        dataArray.forEach(function(row, index) {
+          if(!row[1] && !row[2]) return;
+          let date = formatThaiDate(row[1]);
+          let projectTextRaw = (row[2] || "").replace(/\\u000A/g, ' ').replace(/\n/g, ' ').replace(/"""/g, '"').replace(/''/g, "'").replace(/^"+|"+$/g, '').trim();
+          let specialCategory = String(row[3] || "").trim(), category = String(row[4] || "").trim() || "ไม่ระบุ", type = String(row[5] || "").trim() || "ไม่ระบุ";
+          let source = String(row[6] || "").trim() || "ไม่ระบุ", media = String(row[7] || "").trim() || "ไม่ระบุ";
+          let prVal = parseFloat(String(row[8]).replace(/,/g, '')) || 0;
+          let quarterVal = String(row[10] || "").trim(), projectUrl = row[11], stdMonth = getStandardMonth(date);
+
+          if (!projectUrl && projectTextRaw.match(/(https?:\/\/[^\s]+)/)) { projectUrl = projectTextRaw.match(/(https?:\/\/[^\s]+)/)[0]; projectTextRaw = projectTextRaw.replace(projectUrl, '').trim(); }
+
+          globalData.push({ date: date, project_raw: projectTextRaw, url: projectUrl, special: specialCategory, category: category, type: type, source: source, media: media, prValue: prVal, quarter: quarterVal, month: stdMonth });
+
+          if(quarterVal) quartersForFilter.add(quarterVal);
+          if(stdMonth) monthsForFilter.add(stdMonth);
+
+          let projectHtml = projectUrl ? `<div class="mb-2 text-wrap" style="line-height: 1.4;">${projectTextRaw}</div><a href="${projectUrl}" target="_blank" class="btn btn-sm d-inline-flex align-items-center gap-1 shadow-sm" style="background-color: var(--cra-orange); color: white; border-radius: 6px; font-size: 0.75rem; padding: 4px 10px; border: none; text-decoration: none;"><i class="bi bi-box-arrow-up-right"></i> ดูเพิ่มเติม</a>` : projectTextRaw;
+          let specialIcon = specialCategory.includes("พระกรณียกิจ") ? `<i class="bi bi-check-circle-fill" style="color: #10b981; font-size: 1.2rem;"></i>` : `<i class="bi bi-x" style="color: #cbd5e1; font-size: 1.5rem;"></i>`;
+
+          tbody += `<tr><td class="text-center text-muted">${index + 1}</td><td class="text-nowrap">${date}</td><td class="fw-medium text-wrap" style="max-width: 250px;">${projectHtml}</td><td class="text-center">${specialIcon}</td><td><span class="badge-category">${category}</span></td><td class="fw-bold text-end pe-4" style="color: var(--cra-blue); font-size: 1.05rem;">${prVal.toLocaleString('th-TH', {maximumFractionDigits:0})} <span style="font-size: 0.75rem; font-weight: normal; color: var(--cra-text-muted); margin-left: 2px;">บาท</span></td><td>${type}</td><td>${source}</td><td class="text-muted">${media}</td><td style="display:none;">${quarterVal}</td><td style="display:none;">${stdMonth}</td><td style="display:none;">${specialCategory}</td></tr>`;
+        }); 
+
+        $('#filterQuarter').empty().append('<option value="">-- ทุกไตรมาส --</option>');
+        $('#filterMonth').empty().append('<option value="">-- ทุกเดือน --</option>');
+        [...quartersForFilter].sort().forEach(q => $('#filterQuarter').append(new Option("ไตรมาส: " + q, q)));
+        [...monthsForFilter].sort().forEach(m => $('#filterMonth').append(new Option("เดือน: " + m.substring(3), m)));
+
+        if(datatableInstance) { datatableInstance.destroy(); }
+        $('#dataTable tbody').html(tbody);
+        
+        $.fn.DataTable.ext.pager.numbers_length = 5;
+        datatableInstance = $('#dataTable').DataTable({ 
+          "dom": 't<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-4"i<"d-flex flex-column flex-md-row align-items-center gap-2"p<"jump-to-page">>>',
+          "pageLength": 10, "language": { "emptyTable": "ไม่พบข้อมูล", "info": "แสดงรายการ _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ", "paginate": { "next": "<b>&gt;</b>", "previous": "<b>&lt;</b>" } } 
+        });
+
+        $("div.jump-to-page").html(`<div class="d-flex align-items-center justify-content-center mt-2 mt-md-0 ms-md-2"><span class="text-muted me-2" style="font-size: 0.8rem;">หน้า:</span><input type="number" id="jumpInput" class="form-control text-center shadow-sm px-1" style="width: 55px; height: 32px; border-radius: 8px; font-size: 0.85rem; border: 1px solid #cbd5e1;" min="1"></div>`); 
+        $('#jumpInput').on('change', function() { let target = parseInt($(this).val(), 10); if (target >= 1 && target <= datatableInstance.page.info().pages) { datatableInstance.page(target - 1).draw('page'); } else { $(this).val(datatableInstance.page.info().page + 1); } });
+        datatableInstance.on('draw', function() { let info = datatableInstance.page.info(); $('#jumpInput').val(info.page + 1).attr('max', info.pages); });
+
+        updateDashboardWidgets(true);
+      }
+
+      $(document).ready(function() {
+        // อนิเมชั่นหลอกๆ สำหรับหน้าโหลดดิ้ง
+        let progress = 15;
+        let progressInterval = setInterval(() => { if(progress < 90) { progress += Math.floor(Math.random() * 5)+2; $('#progressBar').css('width', progress + '%'); $('#progressText').text(progress); } }, 150); 
+        const hideLoader = () => { clearInterval(progressInterval); $('#progressBar').css('width', '100%'); $('#progressText').text('100'); setTimeout(() => $('#loader-wrapper').addClass('loader-hidden'), 300); }
+
+        // Event Listeners (ใส่ครั้งเดียวตอนโหลดหน้า)
+        $('#filterQuarter, #filterMonth, #filterCategory, #filterSpecial').on('change', () => updateDashboardWidgets(true));
+        $(document).on('change', '.type-checkbox', () => updateDashboardWidgets(false));
+        $('#customSearch').on('keyup', () => updateDashboardWidgets(false));
+
+        // 🚀 ระบบจัดการ Cache (Stale-while-revalidate)
+        let cachedRawData = localStorage.getItem(CACHE_KEY);
+        
+        if (cachedRawData) {
+            // ✅ มีแคช: ให้ Render ข้อมูลเก่าทันที! (เร็ว 10x)
+            try {
+                let parsedCache = JSON.parse(cachedRawData);
+                buildApplication(parsedCache);
+                hideLoader(); // ซ่อนหน้าโหลดดิ้งทันที
+                
+                // แอบดึงข้อมูลใหม่หลังบ้าน (Background fetch) เอา nocache ออกแล้วใช้การเรียกปกติ
+                fetch(API_URL + "?action=getSheetData&sheetName=FreeMedia")
+                  .then(res => res.json())
+                  .then(newData => {
+                      // เช็คว่าข้อมูลเปลี่ยนไหม (เทียบ string แบบเร็วๆ)
+                      if(JSON.stringify(newData) !== cachedRawData) {
+                          localStorage.setItem(CACHE_KEY, JSON.stringify(newData));
+                          // แสดง Toast แจ้งเตือนเล็กๆ ว่ามีข้อมูลใหม่
+                          $('#update-toast').addClass('show');
+                          setTimeout(() => $('#update-toast').removeClass('show'), 8000);
+                      }
+                  }).catch(e => console.log("Background fetch failed", e));
+                  
+            } catch (e) {
+                console.error("Cache corrupted, fetching fresh data...");
+                localStorage.removeItem(CACHE_KEY);
+                fetchFreshData();
+            }
+        } else {
+            // ❌ ไม่มีแคช: โหลดครั้งแรก ต้องดึงข้อมูลสด
+            fetchFreshData();
         }
 
-        // 🎯 เติมตัวแปร nocache เพื่อบังคับให้เบราว์เซอร์ไปดึงข้อมูลใหม่จาก Google Sheet ไม่เอา Cache เดิม
-        const urlWithNoCache = API_URL + "?action=getSheetData&sheetName=FreeMedia&nocache=" + new Date().getTime();
-
-        fetch(urlWithNoCache, { redirect: "follow" })
-          .then(response => response.json())
-          .then(data => {
-            if(data.error) throw new Error(data.error);
-
-            let tbody = '';
-            let quartersForFilter = new Set();
-            let monthsForFilter = new Set();
-            
-            data.forEach(function(row, index) {
-              if(!row[1] && !row[2]) return;
-              let rawDate = row[1];
-              let date = formatThaiDate(rawDate);
-              let projectTextRaw = row[2] || "";
-
-              // 🎯 ทำความสะอาดข้อความ ลบ \u000A และเครื่องหมายคำพูดแปลกๆ ที่ติดมาจากชีต
-              projectTextRaw = projectTextRaw.replace(/\\u000A/g, ' ').replace(/\n/g, ' ').replace(/"""/g, '"').replace(/''/g, "'").replace(/^"+|"+$/g, '').trim();
-
-              let specialCategory = row[3] ? String(row[3]).trim() : ""; 
-              let category = row[4] ? String(row[4]).trim() : "ไม่ระบุ"; 
-              let type = row[5] ? String(row[5]).trim() : "ไม่ระบุ"; 
-              let source = row[6] ? String(row[6]).trim() : "ไม่ระบุ"; 
-              let media = row[7] ? String(row[7]).trim() : "ไม่ระบุ"; 
-              let prVal = parseFloat(String(row[8]).replace(/,/g, '')) || 0; 
-              let quarterVal = row[10] ? String(row[10]).trim() : ""; 
-              let projectUrl = row[11]; 
-              let stdMonth = getStandardMonth(date);
-
-              // 🎯 [Frontend Fallback] กรณีที่หลังบ้านดึงลิงก์มาไม่สำเร็จ (หรือเกิด Error) แต่มี URL ซ่อนอยู่ในข้อความ 
-              // ให้ทำการดึง URL นั้นออกมาและลบออกจากข้อความเพื่อให้ตารางดูสะอาดตา
-              if (!projectUrl && projectTextRaw.match(/(https?:\/\/[^\s]+)/)) {
-                  projectUrl = projectTextRaw.match(/(https?:\/\/[^\s]+)/)[0];
-                  projectTextRaw = projectTextRaw.replace(projectUrl, '').trim();
-              }
-
-              globalData.push({
-                date: date, project_raw: projectTextRaw, url: projectUrl,
-                special: specialCategory, 
-                category: category, type: type,
-                source: source, media: media,
-                prValue: prVal, quarter: quarterVal, month: stdMonth
+        function fetchFreshData() {
+            // เอาคำว่า nocache ออก เพื่อให้เซิร์ฟเวอร์ตอบสนองได้เร็วที่สุดเท่าที่ทำได้
+            fetch(API_URL + "?action=getSheetData&sheetName=FreeMedia")
+              .then(res => res.json())
+              .then(data => {
+                if(data.error) throw new Error(data.error);
+                // เก็บข้อมูลลง Cache เครื่องผู้ใช้
+                localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                buildApplication(data);
+                hideLoader();
+              })
+              .catch(err => {
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheets: " + err.message);
+                hideLoader();
               });
-
-              let projectHtml = projectTextRaw;
-              if(projectUrl) {
-                 projectHtml = `<div class="mb-2 text-wrap" style="line-height: 1.4;">${projectTextRaw}</div><a href="${projectUrl}" target="_blank" class="btn btn-sm d-inline-flex align-items-center gap-1 shadow-sm" style="background-color: var(--cra-orange); color: white; border-radius: 6px; font-size: 0.75rem; padding: 4px 10px; border: none; text-decoration: none;"><i class="bi bi-box-arrow-up-right"></i> ดูเพิ่มเติม</a>`;
-              }
-
-              if(quarterVal) quartersForFilter.add(quarterVal);
-              if(stdMonth) monthsForFilter.add(stdMonth);
-
-              let specialIcon = specialCategory.includes("พระกรณียกิจ") 
-                ? `<i class="bi bi-check-circle-fill" style="color: #10b981; font-size: 1.2rem;"></i>` 
-                : `<i class="bi bi-x" style="color: #cbd5e1; font-size: 1.5rem;"></i>`;
-
-              tbody += `<tr>
-                <td class="text-center text-muted">${index + 1}</td>
-                <td class="text-nowrap">${date}</td>
-                <td class="fw-medium text-wrap" style="max-width: 250px;">${projectHtml}</td>
-                <td class="text-center">${specialIcon}</td>
-                <td><span class="badge-category">${category}</span></td>
-                <td class="fw-bold text-end pe-4" style="color: var(--cra-blue); font-size: 1.05rem;">
-                  ${prVal.toLocaleString('th-TH', {maximumFractionDigits:0})} 
-                  <span style="font-size: 0.75rem; font-weight: normal; color: var(--cra-text-muted); margin-left: 2px;">บาท</span>
-                </td>
-                <td>${type}</td>
-                <td>${source}</td>
-                <td class="text-muted">${media}</td>
-                <td style="display:none;">${quarterVal}</td>
-                <td style="display:none;">${stdMonth}</td>
-                <td style="display:none;">${specialCategory}</td>
-              </tr>`;
-            }); 
-
-            [...quartersForFilter].sort().forEach(q => $('#filterQuarter').append(new Option("ไตรมาส: " + q, q)));
-            [...monthsForFilter].sort().forEach(m => { let displayMonth = m.substring(3); $('#filterMonth').append(new Option("เดือน: " + displayMonth, m)); });
-
-            $('#dataTable tbody').html(tbody);
-            $.fn.DataTable.ext.pager.numbers_length = 5;
-
-            let table = $('#dataTable').DataTable({ 
-              "dom": 't<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-4"i<"d-flex flex-column flex-md-row align-items-center gap-2"p<"jump-to-page">>>',
-              "pageLength": 10, 
-              "language": { 
-                "emptyTable": "ไม่พบข้อมูล", 
-                "info": "แสดงรายการ _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ", 
-                "paginate": { "next": "<b>&gt;</b>", "previous": "<b>&lt;</b>" } 
-              } 
-            });
-
-            let jumpHtml = `
-              <div class="d-flex align-items-center justify-content-center mt-2 mt-md-0 ms-md-2">
-                <span class="text-muted me-2" style="font-size: 0.8rem;">หน้า:</span>
-                <input type="number" id="jumpInput" class="form-control text-center shadow-sm px-1" style="width: 55px; height: 32px; border-radius: 8px; font-size: 0.85rem; border: 1px solid #cbd5e1;" min="1">
-              </div>
-            `;
-            $("div.jump-to-page").html(jumpHtml); 
-
-            $('#jumpInput').on('change', function() {
-              let targetPage = parseInt($(this).val(), 10); 
-              let maxPage = table.page.info().pages; 
-              if (targetPage >= 1 && targetPage <= maxPage) {
-                table.page(targetPage - 1).draw('page'); 
-              } else {
-                $(this).val(table.page.info().page + 1); 
-              }
-            });
-
-            table.on('draw', function() {
-              let info = table.page.info();
-              $('#jumpInput').val(info.page + 1).attr('max', info.pages);
-            });
-
-            $('#filterQuarter, #filterMonth, #filterCategory, #filterSpecial').on('change', function() { 
-                updateDashboardWidgets(true); 
-            });
-            $(document).on('change', '.type-checkbox', function() { 
-                updateDashboardWidgets(false); 
-            });
-            $('#customSearch').on('keyup', function() { 
-                updateDashboardWidgets(false); 
-            });
-
-            updateDashboardWidgets(true);
-            finishLoading();
-          })
-          .catch(error => {
-            console.error("Error:", error); 
-            alert("เกิดข้อผิดพลาดในการโหลดข้อมูล: " + error.message); 
-            finishLoading();
-          });
+        }
       });
     </script>
   </body>
