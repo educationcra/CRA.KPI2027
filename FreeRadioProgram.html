@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRA News Dashboard 2027 - บริการวิชาการสื่อวิทยุ</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 🎯 เพิ่มไลบรารี SheetJS สำหรับ Export Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+
+    <style>
+      :root {
+        --cra-blue: #1d2b53;
+        --cra-orange: #ea580c;
+        --cra-green: #10b981; /* สีประจำหน้าวิทยุ */
+        --cra-bg: #f8faff; 
+        --cra-card-bg: #ffffff;
+        --cra-text-main: #334155;
+        --cra-text-muted: #64748b;
+      }
+
+      body { 
+        background-color: var(--cra-bg); 
+        /* 🎯 พื้นหลัง Pastel Mesh Gradient */
+        background-image: 
+          radial-gradient(at 10% 10%, rgba(224, 231, 255, 0.9) 0px, transparent 50%),
+          radial-gradient(at 90% 10%, rgba(209, 250, 229, 0.9) 0px, transparent 50%),
+          radial-gradient(at 50% 90%, rgba(224, 242, 254, 0.9) 0px, transparent 50%);
+        background-attachment: fixed;
+        font-family: 'Noto Sans Thai', sans-serif !important; 
+        color: var(--cra-text-main);
+        padding-bottom: 50px;
+        min-height: 100vh;
+      }
+
+      .top-nav { margin-bottom: 2rem; display: flex; align-items: center; gap: 15px; margin-top: 20px;}
+      .btn-back { background: #ffffff; color: #1e293b; padding: 8px 20px; border-radius: 50px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #e2e8f0; }
+      .btn-back:hover { background: #f1f5f9; color: var(--cra-green); transform: translateY(-2px); }
+      .nav-divider { margin: 0 10px; color: #cbd5e1; }
+
+      .cra-card { 
+        background: rgba(255, 255, 255, 0.85); 
+        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        border-radius: 24px; padding: 24px; margin-bottom: 1.5rem;
+        box-shadow: 0 10px 30px rgba(47, 60, 90, 0.04);
+        border: 1px solid rgba(255,255,255,0.8);
+        transition: transform 0.3s ease;
+      }
+      .cra-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(47, 60, 90, 0.08); }
+
+      .filter-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 16px; font-size: 0.9rem; color: var(--cra-text-main); outline: none; transition: 0.2s;}
+      .filter-box:focus { border-color: var(--cra-green); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+      select.filter-box { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+
+      .search-group .input-group-text { border-radius: 12px 0 0 12px; border-color: #e2e8f0; }
+      .search-group input { border-radius: 0 12px 12px 0; }
+
+      /* ปุ่ม Export Excel */
+      .btn-export { background-color: #10b981; color: white; border: none; border-radius: 12px; padding: 10px 16px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2); transition: 0.3s; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+      .btn-export:hover { background-color: #059669; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3); color: white; }
+
+      /* 🎯 ป้ายเม็ดยา Header */
+      .data-pill {
+        display: inline-flex; align-items: center;
+        background: linear-gradient(135deg, #1d2b53 0%, #2b3f7a 100%);
+        color: white; padding: 12px 28px; border-radius: 50px;
+        box-shadow: 0 8px 20px rgba(29, 43, 83, 0.2);
+        font-size: 1.1rem; font-weight: 500; transition: all 0.3s ease;
+      }
+      .data-pill.filtered {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+      }
+      .data-pill .highlight-num {
+        font-size: 1.6rem; font-weight: 900; background: rgba(255,255,255,0.2);
+        padding: 2px 16px; border-radius: 30px; margin: 0 10px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      }
+
+      .badge-category { background: rgba(16, 185, 129, 0.1); color: var(--cra-green); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+      .chart-container { position: relative; height: 250px; width: 100%; margin-bottom: 20px;}
+      .chart-center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
+      .chart-center-text .label { font-size: 0.8rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+      .chart-center-text .value { font-size: 1.8rem; font-weight: 800; color: #1e293b; line-height: 1.1; }
+      
+      .chart-legend-container { max-height: 250px; overflow-y: auto; padding-right: 10px; }
+      .chart-legend-container::-webkit-scrollbar { width: 6px; }
+      .chart-legend-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+      .chart-legend-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+      .legend-item { font-size: 0.95rem; padding: 10px 0; border-bottom: 1px dashed #e2e8f0; transition: background-color 0.2s; }
+      .legend-item:last-child { border-bottom: none; }
+      .legend-item:hover { background-color: #f8fafc; }
+      .legend-color-dot { display: inline-block; min-width: 14px; height: 14px; border-radius: 50%; margin-right: 12px; }
+      .legend-text { flex: 1; min-width: 0; color: var(--cra-text-main); font-weight: 500;}
+      .legend-count { width: 50px; text-align: right; font-weight: 700; color: var(--cra-green); }
+      .legend-percent { width: 90px; text-align: right; color: var(--cra-text-muted); font-size: 0.85rem;}
+      .card-header-badge { background-color: #f1f5f9; color: #475569; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+
+      /* ตาราง */
+      .table-responsive { border-radius: 12px; }
+      .cra-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+      .cra-table th, .cra-table td { vertical-align: middle; padding: 14px 16px; white-space: normal !important; }
+      .cra-table th { background-color: #f8fafc; color: var(--cra-text-muted); font-weight: 600; font-size: 0.85rem; border-bottom: 2px solid #e2e8f0; border-top: 1px solid #e2e8f0; white-space: nowrap !important; }
+      .cra-table td { border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; color: #475569; }
+      .cra-table tbody tr:nth-of-type(odd) { background-color: #ffffff; }
+      .cra-table tbody tr:nth-of-type(even) { background-color: #fafbfc; }
+      .cra-table tbody tr:hover td { background-color: #f1f5f9; }
+      
+      .badge-category, .badge { white-space: nowrap !important; display: inline-block; }
+      .cra-table td:nth-child(2), .cra-table td.text-end { white-space: nowrap !important; }
+      .cra-table th:nth-child(3), .cra-table td.text-wrap { min-width: 250px; line-height: 1.5; }
+      .cra-table th:nth-child(5), .cra-table td:nth-child(5), .cra-table th:nth-child(7), .cra-table td:nth-child(7) { min-width: 160px; }
+
+      .dataTables_filter, .dataTables_length { display: none !important; }
+      .dataTables_info { color: var(--cra-text-muted); text-align: center; margin-bottom: 10px; font-size: 0.8rem; }
+      .pagination { flex-wrap: wrap; justify-content: center; gap: 2px;}
+      .page-item.active .page-link { background-color: var(--cra-green); border-color: var(--cra-green);padding: 6px 10px; }
+
+      #loader-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
+      .loader-logo { font-size: 1.5rem; font-weight: 800; color: var(--cra-green); margin-bottom: 20px; text-align: center;}
+      .progress-container { width: 250px; height: 8px; background-color: #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 15px;}
+      .progress-bar-fill { height: 100%; background-color: var(--cra-green); width: 0%; transition: width 0.3s; }
+      .loader-hidden { opacity: 0; pointer-events: none; visibility: hidden;}
+
+      /* แจ้งเตือนอัปเดตข้อมูล */
+      #update-toast { position: fixed; bottom: 20px; right: 20px; background-color: #059669; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); z-index: 9999; transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); pointer-events: none; }
+      #update-toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+
+      @media (max-width: 768px) {
+        .cra-table th, .cra-table td { padding: 10px 12px; font-size: 0.85rem; }
+        .justify-content-lg-end { justify-content: flex-start !important; }
+        .btn-export { width: 100%; justify-content: center; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loader-wrapper">
+      <div class="loader-logo">CRA News Dashboard 2027<br>ข่าววิทยุ</div>
+      <div class="progress-container"><div class="progress-bar-fill" id="progressBar"></div></div>
+      <div class="progress-text">กำลังดึงข้อมูล... <span id="progressText" style="color: var(--cra-green); font-weight: 700;">0</span>%</div>
+    </div>
+
+    <div id="update-toast">✅ อัปเดตข้อมูลล่าสุดเรียบร้อยแล้ว <a href="#" onclick="location.reload();" style="color: #6ee7b7; margin-left: 10px;">รีเฟรชหน้าเว็บ</a></div>
+
+    <div class="container-fluid py-4 px-md-5">
+      <div class="top-nav">
+        <a href="index.html" class="btn-back"><i class="bi bi-arrow-left"></i> กลับหน้าหลัก</a>
+        <span class="nav-divider">↹</span>
+        <span class="text-muted" style="font-size: 0.9rem;">Dashboard บริการวิชาการสื่อวิทยุ</span>
+      </div>
+
+      <!-- 🎯 1. ส่วน Header เม็ดยา (Pill) -->
+      <div class="text-center mb-4 mt-3" id="mainDataHeader">
+        <div class="data-pill">กำลังโหลดข้อมูล...</div>
+      </div>
+
+      <!-- 🎯 2. ตัวกรองภาพรวม (Global Filter Panel) 1 แถว 3 คอลัมน์ -->
+      <div class="cra-card mb-4" style="padding: 16px 24px;">
+        <div class="row g-3 align-items-center">
+          
+          <!-- คอลัมน์ 1: ค้นหา & Export -->
+          <div class="col-lg-4 d-flex flex-wrap flex-xl-nowrap gap-2">
+            <div class="input-group search-group flex-grow-1" style="width: auto; min-width: 150px;">
+              <span class="input-group-text bg-white border-end-0 ps-3">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" id="customSearch" class="form-control filter-box border-start-0 ps-2 m-0 shadow-none" placeholder="ค้นหาทั่วไป..." style="border-radius: 0 12px 12px 0;">
+            </div>
+            <button class="btn btn-export flex-shrink-0" onclick="exportDataToExcel()" style="min-width: max-content;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              Export
+            </button>
+          </div>
+
+          <!-- คอลัมน์ 2: ช่อง & รายการ -->
+          <div class="col-lg-5 d-flex flex-wrap flex-xl-nowrap gap-2 align-items-center">
+            <select id="filterChannel" class="filter-box flex-grow-1" style="padding: 10px;">
+              <option value="">- ช่องที่ออกอากาศ -</option>
+            </select>
+            <select id="filterProgram" class="filter-box flex-grow-1" style="padding: 10px;">
+              <option value="">- รายการ -</option>
+            </select>
+          </div>
+
+          <!-- คอลัมน์ 3: Global Filter (ไตรมาส & เดือน) -->
+          <div class="col-lg-3 d-flex flex-wrap flex-xl-nowrap gap-2 align-items-center justify-content-lg-end">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cra-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="d-none d-xxl-block flex-shrink-0" title="ตัวกรองภาพรวม"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            <select id="filterQuarter" class="form-select fw-bold border shadow-sm filter-box flex-grow-1" style="color: var(--cra-blue); background-color: #f8fafc; padding: 10px; min-width: 100px;">
+              <option value="">-- ทุกไตรมาส --</option>
+            </select>
+            <select id="filterMonth" class="form-select fw-bold border shadow-sm filter-box flex-grow-1" style="color: var(--cra-green); background-color: #f8fafc; padding: 10px; min-width: 100px;">
+              <option value="">-- ทุกเดือน --</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- สรุปตัวเลข -->
+      <div class="row mb-4 g-4 align-items-stretch">
+        <div class="col-md-6">
+          <div class="cra-card h-100 d-flex flex-column justify-content-center align-items-start" style="border-left: 6px solid var(--cra-green); padding: 20px 30px;">
+            <div class="d-flex align-items-center">
+              <div class="menu-icon-box mb-0 me-3" style="width: 56px; height: 56px; font-size: 24px; background: rgba(16, 185, 129, 0.1); color: var(--cra-green); border-radius: 14px; display: flex; justify-content: center; align-items: center;">
+                <i class="bi bi-broadcast"></i>
+              </div>
+              <div>
+                <p class="text-muted small fw-bold mb-1">ยอด PR Value รวม (บาท)</p>
+                <div class="fw-bold" style="font-size: 2.2rem; color: var(--cra-green); line-height: 1.1;" id="sumPR">กำลังคำนวณ...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="cra-card h-100 d-flex flex-column justify-content-center align-items-start" style="border-left: 6px solid var(--cra-blue); padding: 20px 30px;">
+            <p class="text-muted small fw-bold mb-1">จำนวนข่าวทั้งหมด</p>
+            <div class="fw-bold text-dark d-flex align-items-baseline gap-2" style="font-size: 2.2rem; line-height: 1.1;">
+              <span id="totalNews">-</span> <span style="font-size: 1rem; color: var(--cra-text-muted); font-weight: 400;">รายการ</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-4 g-4">
+        <div class="col-md-6">
+          <div class="cra-card h-100 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-4"><h6 class="fw-bold mb-0"><i class="bi bi-mic-fill me-2" style="color: var(--cra-blue);"></i> ช่องที่ออกอากาศ</h6><span class="card-header-badge" id="badgeChannel">รวมทั้งหมด</span></div>
+            <div class="chart-container"><canvas id="channelChart"></canvas><div class="chart-center-text"><div class="label">ทั้งหมด</div><div class="value" id="channelTotal">-</div></div></div>
+            <div class="chart-legend-container mt-3 flex-grow-1"><div id="channelLegend"></div></div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="cra-card h-100 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-4"><h6 class="fw-bold mb-0"><i class="bi bi-collection-play-fill me-2" style="color: var(--cra-orange);"></i> รายการวิทยุ</h6><span class="card-header-badge" id="badgeProgram">รวมทั้งหมด</span></div>
+            <div class="chart-container"><canvas id="programChart"></canvas><div class="chart-center-text"><div class="label">ทั้งหมด</div><div class="value" id="programTotal">-</div></div></div>
+            <div class="chart-legend-container mt-3 flex-grow-1"><div id="programLegend"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cra-card">
+        <div class="mb-4">
+          <h5 class="fw-bold mb-0" style="color: var(--cra-green); white-space: nowrap;"><i class="bi bi-database-fill me-2" style="color: var(--cra-blue);"></i> ฐานข้อมูลวิทยุ</h5>
+        </div>
+        <div class="table-responsive">
+          <table id="dataTable" class="cra-table">
+            <thead>
+              <tr>
+                <th style="width: 5%; text-align: center;">#</th>
+                <th style="width: 10%;">วันที่ออกอากาศ</th>
+                <th style="width: 25%;">ประเด็นสุขภาพ/หัวข้อ</th> 
+                <th style="width: 15%;">ช่องที่ออกอากาศ</th>
+                <th style="width: 15%;">รายการ</th>
+                <th class="text-end pe-4" style="width: 12%;">PR Value</th>
+                <th style="width: 18%;">แพทย์ที่ให้สัมภาษณ์</th>
+                <th style="display:none;">Quarter</th>
+                <th style="display:none;">Month</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+      const API_URL = "https://script.google.com/macros/s/AKfycbwqN-9Yhsu9me5F3UxBCiG9HaRSQpxPuRpkHeQOt7KwB6u_0H_wx63nozGCAg7GOJ_L-Q/exec";
+      // 🚀 CACHE CONFIGURATION สำหรับวิทยุ
+      const CACHE_KEY = "cra_news_cache_freeradio";
+      
+      const chartColors = ['#1d2b53', '#ea580c', '#eab308', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b'];
+      let globalData = []; 
+      let currentFilteredData = [];
+      let chartInstances = {};
+      let datatableInstance = null;
+
+      // 🎯 Export Excel
+      function exportDataToExcel() {
+        if (currentFilteredData.length === 0) {
+          alert("ไม่มีข้อมูลสำหรับดาวน์โหลด กรุณาปรับเงื่อนไขการค้นหาใหม่");
+          return;
+        }
+
+        const excelData = currentFilteredData.map((item, index) => {
+          return {
+            "ลำดับ": index + 1,
+            "วันที่ออกอากาศ": item.date,
+            "ประเด็นสุขภาพ/หัวข้อ": item.title,
+            "URL อ้างอิง": item.url || "-",
+            "ช่องที่ออกอากาศ": item.channel,
+            "รายการ": item.program,
+            "แพทย์ที่ให้สัมภาษณ์": item.doctor,
+            "PR Value (บาท)": item.prValue,
+            "ไตรมาส": item.quarter,
+            "เดือน": item.month
+          };
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Radio_News_Data");
+
+        let dateStr = new Date().toISOString().slice(0,10).replace(/-/g, "");
+        XLSX.writeFile(workbook, `CRA_Radio_Export_${dateStr}.xlsx`);
+      }
+
+      function getStandardMonth(dateStr) {
+        if(!dateStr) return ""; const str = String(dateStr).toLowerCase();
+        if(str.includes('มกราคม')||str.includes('ม.ค.')||str.includes('jan')) return "01-มกราคม"; if(str.includes('กุมภาพันธ์')||str.includes('ก.พ.')||str.includes('feb')) return "02-กุมภาพันธ์"; if(str.includes('มีนาคม')||str.includes('มี.ค.')||str.includes('mar')) return "03-มีนาคม"; if(str.includes('เมษายน')||str.includes('เม.ย.')||str.includes('apr')) return "04-เมษายน"; if(str.includes('พฤษภาคม')||str.includes('พ.ค.')||str.includes('may')) return "05-พฤษภาคม"; if(str.includes('มิถุนายน')||str.includes('มิ.ย.')||str.includes('jun')) return "06-มิถุนายน"; if(str.includes('กรกฎาคม')||str.includes('ก.ค.')||str.includes('jul')) return "07-กรกฎาคม"; if(str.includes('สิงหาคม')||str.includes('ส.ค.')||str.includes('aug')) return "08-สิงหาคม"; if(str.includes('กันยายน')||str.includes('ก.ย.')||str.includes('sep')) return "09-กันยายน"; if(str.includes('ตุลาคม')||str.includes('ต.ค.')||str.includes('oct')) return "10-ตุลาคม"; if(str.includes('พฤศจิกายน')||str.includes('พ.ย.')||str.includes('nov')) return "11-พฤศจิกายน"; if(str.includes('ธันวาคม')||str.includes('ธ.ค.')||str.includes('dec')) return "12-ธันวาคม"; return "";
+      }
+      
+      function formatThaiDate(rawDate) {
+        if (!rawDate) return ""; let str = String(rawDate).trim();
+        if (/[ก-๙]/.test(str)) { return str; }
+        let d = new Date(str);
+        if (!isNaN(d.getTime())) { return `${d.getDate()} ${["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."][d.getMonth() + 1]} ${d.getFullYear() < 2500 ? d.getFullYear() + 543 : d.getFullYear()}`; }
+        return str; 
+      }
+
+      function analyzeObj(dataArray, key) {
+        let counts = {}; let total = 0;
+        dataArray.forEach(item => { let val = item[key] ? item[key] : "ไม่ระบุ"; if(val === "") val = "ไม่ระบุ"; counts[val] = (counts[val] || 0) + 1; total++; });
+        let sorted = Object.keys(counts).map(k => ({ name: k, count: counts[k], percent: total > 0 ? ((counts[k]/total)*100).toFixed(2) : "0.00" })).sort((a,b) => b.count - a.count);
+        return { total: total, items: sorted };
+      }
+
+      function renderDonutChart(canvasId, legendId, totalId, dataObj) {
+        if (chartInstances[canvasId]) { chartInstances[canvasId].destroy(); }
+        $('#' + totalId).text(dataObj.total);
+        let labels = dataObj.items.map(i => i.name); let dataCounts = dataObj.items.map(i => i.count); let bgColors = labels.map((_, i) => chartColors[i % chartColors.length]);
+        if(dataObj.total === 0) { $('#' + legendId).html('<div class="text-center py-4 text-muted">ไม่มีข้อมูล</div>'); return; }
+        chartInstances[canvasId] = new Chart(document.getElementById(canvasId), { type: 'doughnut', data: { labels: labels, datasets: [{ data: dataCounts, backgroundColor: bgColors, borderWidth: 0, hoverOffset: 4 }] }, options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+        let legendHtml = '<div>';
+        dataObj.items.forEach((item, index) => {
+          legendHtml += `<div class="d-flex justify-content-between align-items-center legend-item"><div class="d-flex align-items-center text-truncate pe-3"><span style="display:inline-block; width:12px; height:12px; border-radius:50%; background-color:${bgColors[index]}; margin-right:10px;"></span><span class="text-truncate fw-medium" title="${item.name}">${item.name}</span></div><div class="d-flex align-items-center gap-3"><span class="fw-bold" style="color: var(--cra-green);">${item.count}</span><span style="color: #94a3b8; font-size: 0.85rem; width: 60px; text-align: right;">${item.percent}%</span></div></div>`;
+        });
+        $('#' + legendId).html(legendHtml + '</div>');
+      }
+
+      function updateDashboardWidgets(rebuildDropdowns = true) {
+        let qFilter = $('#filterQuarter').val(); 
+        let mFilter = $('#filterMonth').val();
+
+        let baseFilteredData = globalData.filter(item => {
+            if (qFilter && item.quarter !== qFilter) return false;
+            if (mFilter && item.month !== mFilter) return false;
+            return true;
+        });
+
+        let currentChannel = $('#filterChannel').val();
+        let currentProgram = $('#filterProgram').val();
+
+        if (rebuildDropdowns) {
+            let availableChannels = new Set();
+            let availablePrograms = new Set();
+            
+            baseFilteredData.forEach(item => {
+                availableChannels.add(item.channel);
+                if (currentChannel && item.channel !== currentChannel) return;
+                availablePrograms.add(item.program);
+            });
+
+            $('#filterChannel').empty().append('<option value="">- ช่องที่ออกอากาศ -</option>');
+            [...availableChannels].sort().forEach(c => $('#filterChannel').append(new Option(c, c)));
+            if(availableChannels.has(currentChannel)) { $('#filterChannel').val(currentChannel); } else { currentChannel = ""; }
+
+            $('#filterProgram').empty().append('<option value="">- รายการ -</option>');
+            [...availablePrograms].sort().forEach(p => $('#filterProgram').append(new Option(p, p)));
+            if(availablePrograms.has(currentProgram)) { $('#filterProgram').val(currentProgram); } else { currentProgram = ""; }
+        }
+
+        let cFilter = $('#filterChannel').val(); 
+        let pFilter = $('#filterProgram').val(); 
+        let sFilter = $('#customSearch').val().toLowerCase();
+
+        let finalFiltered = baseFilteredData.filter(item => {
+            if (cFilter && item.channel !== cFilter) return false;
+            if (pFilter && item.program !== pFilter) return false;
+            if (sFilter) { 
+              let textToSearch = `${item.date} ${item.title} ${item.channel} ${item.program} ${item.doctor}`.toLowerCase(); 
+              if (!textToSearch.includes(sFilter)) return false; 
+            }
+            return true;
+        });
+
+        currentFilteredData = finalFiltered;
+
+        let sumPr = finalFiltered.reduce((sum, item) => sum + item.prValue, 0);
+        $('#sumPR').text(sumPr.toLocaleString('th-TH', {maximumFractionDigits:0}));
+        $('#totalNews').text(finalFiltered.length);
+
+        let statusText = (qFilter || mFilter || cFilter || pFilter || sFilter) ? "เฉพาะข้อมูลที่กรอง" : "รวมทั้งหมด";
+        $('#badgeChannel, #badgeProgram').text(statusText);
+
+        renderDonutChart('channelChart', 'channelLegend', 'channelTotal', analyzeObj(finalFiltered, 'channel'));
+        renderDonutChart('programChart', 'programLegend', 'programTotal', analyzeObj(finalFiltered, 'program'));
+
+        if(datatableInstance) {
+          datatableInstance.column(7).search(qFilter); 
+          datatableInstance.column(8).search(mFilter);
+          datatableInstance.column(3).search(cFilter); 
+          datatableInstance.column(4).search(pFilter); 
+          datatableInstance.search(sFilter).draw();
+        }
+
+        // 🎯 อัปเดตข้อความ Header จำนวนข้อมูลแบบ Dynamic (แบบเม็ดยา)
+        let isFiltered = (qFilter || mFilter || cFilter || pFilter || sFilter);
+        let headerHtml = '';
+        if (isFiltered) {
+            let searchText = sFilter ? ` "<span style="color: #fde047;">${$('#customSearch').val()}</span>"` : '';
+            headerHtml = `<div class="data-pill filtered">ชุดข้อมูลที่ท่านค้นหา${searchText} มีทั้งหมด <span class="highlight-num">${finalFiltered.length}</span> ข่าว</div>`;
+        } else {
+            headerHtml = `<div class="data-pill">ชุดข้อมูลข่าววิทยุทั้งหมด <span class="highlight-num">${globalData.length}</span> ข่าว</div>`;
+        }
+        $('#mainDataHeader').html(headerHtml);
+      }
+
+      function buildApplication(dataArray) {
+        let tbody = '';
+        let quartersForFilter = new Set();
+        let monthsForFilter = new Set();
+        globalData = []; 
+
+        dataArray.forEach(function(row, index) {
+          if(!row[1] && !row[2]) return;
+
+          let program = row[1] ? String(row[1]).trim() : "ไม่ระบุ";
+          let channel = row[2] ? String(row[2]).trim() : "ไม่ระบุ";
+          let rawDate = row[3];
+          let date = formatThaiDate(rawDate);
+          let title = row[4] || "";
+          
+          title = title.replace(/\\u000A/g, ' ').replace(/\n/g, ' ').replace(/"""/g, '"').replace(/''/g, "'").replace(/^"+|"+$/g, '').trim();
+          
+          let doctor = row[5] ? String(row[5]).trim() : "";
+          let projectUrl = row[6] || row[10]; 
+          let prVal = parseFloat(String(row[7]).replace(/,/g, '')) || 0;
+          let quarterVal = row[8] ? String(row[8]).trim() : ""; 
+          let stdMonth = getStandardMonth(date); 
+
+          if (!projectUrl && title.match(/(https?:\/\/[^\s]+)/)) {
+              projectUrl = title.match(/(https?:\/\/[^\s]+)/)[0];
+              title = title.replace(projectUrl, '').trim();
+          }
+          if(!title) title = "ไม่ระบุหัวข้อ";
+
+          globalData.push({ 
+            date: date, channel: channel, program: program, 
+            doctor: doctor, title: title, url: projectUrl,
+            prValue: prVal, quarter: quarterVal, month: stdMonth 
+          });
+
+          let titleHtml = title;
+          if(projectUrl && String(projectUrl).includes('http')) {
+             titleHtml = `<div class="mb-2 text-wrap" style="line-height: 1.4;">${title}</div><a href="${projectUrl}" target="_blank" class="badge bg-success text-decoration-none shadow-sm py-2 px-3" style="background-color: var(--cra-green) !important;"><i class="bi bi-headphones"></i> ฟังรายการ</a>`;
+          }
+
+          if(quarterVal) quartersForFilter.add(quarterVal);
+          if(stdMonth) monthsForFilter.add(stdMonth);
+
+          tbody += `<tr>
+            <td class="text-center text-muted">${index + 1}</td>
+            <td>${date}</td>
+            <td class="fw-medium text-wrap" style="max-width: 250px;">${titleHtml}</td>
+            <td><span class="badge-category">${channel}</span></td>
+            <td>${program}</td>
+            <td class="fw-bold text-end pe-4" style="color: var(--cra-green); font-size: 1.05rem;">
+              ${prVal.toLocaleString('th-TH', {maximumFractionDigits:0})} 
+              <span style="font-size: 0.75rem; color: #94a3b8; font-weight: normal;">บาท</span>
+            </td>
+            <td>${doctor}</td>
+            <td style="display:none;">${quarterVal}</td>
+            <td style="display:none;">${stdMonth}</td>
+          </tr>`;
+        });
+
+        $('#filterQuarter').empty().append('<option value="">-- ทุกไตรมาส --</option>');
+        $('#filterMonth').empty().append('<option value="">-- ทุกเดือน --</option>');
+        [...quartersForFilter].sort().forEach(q => $('#filterQuarter').append(new Option("ไตรมาส: " + q, q)));
+        [...monthsForFilter].sort().forEach(m => { let displayMonth = m.substring(3); $('#filterMonth').append(new Option("เดือน: " + displayMonth, m)); });
+        
+        if (datatableInstance) { datatableInstance.destroy(); }
+        
+        $('#dataTable tbody').html(tbody);
+        $.fn.DataTable.ext.pager.numbers_length = 5;
+
+        datatableInstance = $('#dataTable').DataTable({ 
+          "dom": 't<"d-flex flex-column flex-md-row justify-content-between align-items-center mt-4"i<"d-flex flex-column flex-md-row align-items-center gap-2"p<"jump-to-page">>>',
+          "pageLength": 10, 
+          "language": { 
+            "emptyTable": "ไม่พบข้อมูล", 
+            "info": "แสดงรายการ _START_ ถึง _END_ จากทั้งหมด _TOTAL_ รายการ", 
+            "paginate": { "next": "<b>&gt;</b>", "previous": "<b>&lt;</b>" } 
+          } 
+        });
+
+        let jumpHtml = `
+          <div class="d-flex align-items-center justify-content-center mt-2 mt-md-0 ms-md-2">
+            <span class="text-muted me-2" style="font-size: 0.8rem;">หน้า:</span>
+            <input type="number" id="jumpInput" class="form-control text-center shadow-sm px-1" style="width: 55px; height: 32px; border-radius: 8px; font-size: 0.85rem; border: 1px solid #cbd5e1;" min="1">
+          </div>
+        `;
+        $("div.jump-to-page").html(jumpHtml); 
+
+        $('#jumpInput').on('change', function() {
+          let targetPage = parseInt($(this).val(), 10); 
+          let maxPage = datatableInstance.page.info().pages; 
+          
+          if (targetPage >= 1 && targetPage <= maxPage) {
+            datatableInstance.page(targetPage - 1).draw('page'); 
+          } else {
+            $(this).val(datatableInstance.page.info().page + 1); 
+          }
+        });
+
+        datatableInstance.on('draw', function() {
+          let info = datatableInstance.page.info();
+          $('#jumpInput').val(info.page + 1).attr('max', info.pages);
+        });
+
+        updateDashboardWidgets(true);
+      }
+
+      $(document).ready(function() {
+        let progress = 15; 
+        $('#progressBar').css('width', progress + '%'); 
+        $('#progressText').text(progress);
+
+        let progressInterval = setInterval(function() {
+          if (progress < 90) {
+            progress += Math.floor(Math.random() * 5) + 2; 
+            if (progress > 90) progress = 90;
+            $('#progressBar').css('width', progress + '%'); 
+            $('#progressText').text(progress);
+          }
+        }, 150); 
+
+        function hideLoader() {
+          clearInterval(progressInterval);
+          $('#progressBar').css('width', '100%'); 
+          $('#progressText').text('100');
+          setTimeout(function() { $('#loader-wrapper').addClass('loader-hidden'); }, 300); 
+        }
+
+        $('#filterQuarter, #filterMonth, #filterChannel, #filterProgram').on('change', () => updateDashboardWidgets(true));
+        $('#customSearch').on('keyup', () => updateDashboardWidgets(false));
+
+        // 🚀 ระบบจัดการ Cache (Stale-while-revalidate) สำหรับหน้าวิทยุ
+        let cachedRawData = localStorage.getItem(CACHE_KEY);
+        
+        if (cachedRawData) {
+            try {
+                let parsedCache = JSON.parse(cachedRawData);
+                buildApplication(parsedCache);
+                hideLoader(); 
+                
+                fetch(API_URL + "?action=getSheetData&sheetName=FreeRadioProgram")
+                  .then(res => res.json())
+                  .then(newData => {
+                      if(JSON.stringify(newData) !== cachedRawData) {
+                          localStorage.setItem(CACHE_KEY, JSON.stringify(newData));
+                          $('#update-toast').addClass('show');
+                          setTimeout(() => $('#update-toast').removeClass('show'), 8000);
+                      }
+                  }).catch(e => console.log("Background fetch failed", e));
+                  
+            } catch (e) {
+                console.error("Cache corrupted, fetching fresh data...");
+                localStorage.removeItem(CACHE_KEY);
+                fetchFreshData();
+            }
+        } else {
+            fetchFreshData();
+        }
+
+        function fetchFreshData() {
+            fetch(API_URL + "?action=getSheetData&sheetName=FreeRadioProgram")
+              .then(res => res.json())
+              .then(data => {
+                if(data.error) throw new Error(data.error);
+                localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                buildApplication(data);
+                hideLoader();
+              })
+              .catch(err => {
+                alert("เกิดข้อผิดพลาดในการดึงข้อมูล: " + err.message);
+                hideLoader();
+              });
+        }
+      });
+    </script>
+  </body>
+</html>
