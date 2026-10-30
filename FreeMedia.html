@@ -20,6 +20,7 @@
       :root {
         --cra-blue: #1d2b53;
         --cra-orange: #ea580c;
+        --cra-green: #10b981; /* 🎯 เพิ่มสีเขียวสำหรับกราฟสังกัด */
         --cra-bg: #f8faff;
         --cra-card-bg: #ffffff;
         --cra-text-main: #334155;
@@ -71,7 +72,8 @@
       .type-dropdown { width: 250px; }
       .type-dropdown .btn { border: 1px solid #e2e8f0; background: #f8fafc; color: var(--cra-text-main); font-size: 0.9rem; border-radius: 12px; padding: 10px 16px; text-align: left; transition: 0.2s; }
       .type-dropdown .btn:hover, .type-dropdown .btn:focus { border-color: var(--cra-blue); background: #ffffff; box-shadow: 0 0 0 3px rgba(29, 43, 83, 0.1); }
-      .type-dropdown .dropdown-menu { border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 0; overflow: hidden; }
+      /* 🎯 แก้ปัญหาเมนูจมด้วย z-index: 1060 */
+      .type-dropdown .dropdown-menu { border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); padding: 0; overflow: hidden; z-index: 1060; }
       .type-dropdown .dropdown-item { white-space: normal !important; word-wrap: break-word; }
       .type-dropdown .custom-check-label { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; cursor: pointer; width: 100%; transition: background-color 0.2s; margin-bottom: 0; white-space: normal !important; }
       .type-dropdown li:last-child .custom-check-label { border-bottom: none; } 
@@ -91,6 +93,8 @@
       .form-switch .form-check-input { cursor: pointer; width: 2.5em; height: 1.25em; }
       .form-switch .form-check-input:checked { background-color: var(--cra-blue); border-color: var(--cra-blue); }
       .badge-category { background: rgba(29, 43, 83, 0.1); color: var(--cra-blue); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+      /* 🎯 เพิ่มสไตล์สำหรับป้ายสังกัดให้เป็นทรงเม็ดยาแบบพรีเมียม */
+      .badge-department { background: #f1f5f9; color: #475569; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
 
       .chart-container { position: relative; height: 250px; width: 100%; margin-bottom: 20px;}
       .chart-center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
@@ -134,7 +138,7 @@
       .cra-table tbody tr:nth-of-type(even) { background-color: #fafbfc; }
       .cra-table tbody tr:hover td { background-color: #f1f5f9; }
       
-      .badge-category, .badge { white-space: nowrap !important; display: inline-block; }
+      .badge-category, .badge-department, .badge { white-space: nowrap !important; display: inline-block; }
       .cra-table td:nth-child(2), .cra-table td.text-end { white-space: nowrap !important; }
       .cra-table td.text-wrap { min-width: 220px; line-height: 1.5; }
       
@@ -156,7 +160,134 @@
       #update-toast { position: fixed; bottom: 20px; right: 20px; background-color: #1d2b53; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 9999; transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); pointer-events: none; }
       #update-toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
 
-      /* 🎯 เพิ่มสไตล์สำหรับเม็ดยา (Pill) สรุปข้อมูล */
+      /* 🎯 โค้ดปรับแก้ตารางให้คลิกได้ */
+      .cra-table tbody tr { cursor: pointer; transition: background-color 0.2s; }
+      .cra-table tbody tr:hover { background-color: #f1f5f9; }
+
+      /* 🎯 Modal Design (Glassmorphism) */
+      .glass-modal {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+      }
+      .glass-modal .modal-header {
+        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        background: rgba(248, 250, 252, 0.5);
+        padding: 20px 24px;
+      }
+      .glass-modal .modal-body {
+        padding: 30px 24px;
+      }
+      .detail-label {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+      .detail-value {
+        font-size: 1rem;
+        color: #334155;
+        font-weight: 500;
+      }
+      .detail-value.pr-value {
+        font-size: 1.35rem;
+        color: var(--cra-blue);
+        font-weight: 800;
+      }
+
+      /* 🎯 Modern 2026 Command Center (Sticky Filter) */
+      .cra-command-center {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 24px;
+        padding: 20px 24px;
+        box-shadow: 0 15px 35px -5px rgba(29, 43, 83, 0.08), inset 0 1px 0 rgba(255,255,255,1);
+        transition: all 0.3s ease;
+      }
+      @media (min-width: 1200px) {
+        .sticky-desktop {
+          position: sticky;
+          top: 20px;
+          z-index: 1040;
+        }
+      }
+      
+      /* 🎯 Modern Inputs Design */
+      .filter-box { 
+        background: rgba(248, 250, 252, 0.8); 
+        border: 1px solid rgba(226, 232, 240, 0.8); 
+        border-radius: 14px; 
+        padding: 12px 18px; 
+        font-size: 0.95rem; 
+        color: var(--cra-text-main); 
+        outline: none; 
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      }
+      .filter-box:hover {
+        border-color: #cbd5e1;
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      }
+      .filter-box:focus { 
+        background: #ffffff;
+        border-color: var(--cra-blue); 
+        box-shadow: 0 0 0 4px rgba(29, 43, 83, 0.1); 
+      }
+      .search-group .input-group-text { 
+        border-radius: 14px 0 0 14px; 
+        background: rgba(248, 250, 252, 0.8);
+        border: 1px solid rgba(226, 232, 240, 0.8); 
+        border-right: none;
+      }
+      .search-group input.filter-box { 
+        border-radius: 0 14px 14px 0; 
+        border-left: none;
+      }
+      .type-dropdown .btn {
+          border-radius: 14px;
+      }
+      
+      /* 🎯 Mobile Floating Action Button (FAB) */
+      .mobile-fab-container {
+          position: fixed;
+          bottom: 24px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1030;
+          width: 90%;
+          max-width: 350px;
+      }
+      .mobile-fab-btn {
+          background: rgba(29, 43, 83, 0.95);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          color: white;
+          border-radius: 50px;
+          font-weight: 600;
+          font-size: 1.05rem;
+          padding: 14px 24px;
+          border: 1px solid rgba(255,255,255,0.15);
+          box-shadow: 0 12px 24px rgba(29, 43, 83, 0.3);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+          transition: transform 0.2s;
+      }
+      .mobile-fab-btn:active {
+          transform: scale(0.96);
+      }
+
+      /* 🎯 สไตล์สำหรับเม็ดยา (Pill) สรุปข้อมูล */
       .data-pill {
         display: inline-flex;
         align-items: center;
@@ -183,6 +314,15 @@
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
       }
 
+      /* 🎯 คลาสสำหรับตัดคำให้อยู่ใน 3 บรรทัด (พร้อมจุดไข่ปลา ...) */
+      .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
       @media (max-width: 768px) {
         .type-dropdown, select.filter-box, .search-group { width: 100% !important; margin-bottom: 5px; }
         .justify-content-lg-end { justify-content: flex-start !important; }
@@ -202,68 +342,92 @@
 
     <div class="container-fluid py-4 px-md-5">
       
-      <div class="top-nav justify-content-between">
+      <div class="top-nav justify-content-between align-items-center">
         <div>
           <a href="index.html" class="btn-back"><i class="bi bi-arrow-left"></i> กลับหน้าหลัก</a>
           <span class="nav-divider d-none d-sm-inline">↹</span>
           <span class="text-muted d-none d-sm-inline" style="font-size: 0.9rem;">Dashboard ข่าวประชาสัมพันธ์ CRA</span>
         </div>
+        <!-- 🎯 เปลี่ยนโลโก้ใหม่ มุมขวาบน -->
+        <img src="https://s.imgz.io/2026/10/30/cra-prfe57217485806239.png" alt="CRA Logo" style="height: 100px; width: auto; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));" onerror="this.style.display='none'">
       </div>
 
       <!-- 🎯 1. ส่วน Header เปลี่ยนเป็นแบบเม็ดยา (Pill) สีสันสวยงาม -->
-      <div class="text-center mb-4 mt-3" id="mainDataHeader">
+      <div class="text-center mb-4 mt-3 position-relative" style="z-index: 1;" id="mainDataHeader">
         <div class="data-pill">กำลังโหลดข้อมูล...</div>
       </div>
 
-      <!-- 🎯 2. ตัวกรองแบบ 1 แถว 3 คอลัมน์ ตามที่ออกแบบไว้ -->
-      <div class="cra-card mb-4" style="padding: 16px 24px;">
-        <div class="row g-3 align-items-center">
+      <!-- 🎯 Mobile Floating Button (แทนที่ปุ่ม Hamburger เดิม) -->
+      <div class="d-xl-none mobile-fab-container">
+        <button class="btn mobile-fab-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
+            <i class="bi bi-sliders"></i> ค้นหาและกรองข้อมูลข่าว
+        </button>
+      </div>
+
+      <!-- 🎯 2. ตัวกรองภาพรวม (Desktop = Sticky ลอยตัวสวยงาม, Mobile = สไลด์ขึ้นจากล่าง) -->
+      <div class="offcanvas-xl offcanvas-bottom rounded-top-4 shadow-lg" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel" style="max-height: 85vh; z-index: 1060;">
+        <div class="offcanvas-header bg-light border-bottom d-xl-none py-3">
+          <h5 class="offcanvas-title fw-bold" id="filterOffcanvasLabel" style="color: var(--cra-blue);"><i class="bi bi-sliders me-2"></i> ตัวกรองข้อมูล</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-4 p-xl-0 overflow-visible">
           
-          <!-- คอลัมน์ 1: ค้นหา & Export -->
-          <div class="col-lg-4 d-flex flex-wrap flex-xl-nowrap gap-2">
-            <div class="input-group search-group flex-grow-1" style="width: auto; min-width: 150px;">
-              <span class="input-group-text bg-white border-end-0 ps-3">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              </span>
-              <input type="text" id="customSearch" class="form-control filter-box border-start-0 ps-2 m-0 shadow-none" placeholder="ค้นหาทั่วไป..." style="border-radius: 0 12px 12px 0;">
-            </div>
-            <button class="btn btn-export flex-shrink-0" onclick="exportDataToExcel()" style="min-width: max-content;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-              Export
-            </button>
-          </div>
+          <!-- Command Center Panel -->
+          <div class="cra-command-center sticky-desktop w-100 mb-xl-4">
+            <div class="row g-3 align-items-center">
+              
+              <!-- คอลัมน์ 1: ค้นหา & Export -->
+              <div class="col-xl-3 d-flex flex-wrap flex-sm-nowrap gap-2">
+                <div class="input-group search-group flex-grow-1" style="width: auto; min-width: 150px;">
+                  <span class="input-group-text">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  </span>
+                  <input type="text" id="customSearch" class="form-control filter-box ps-2 m-0 shadow-none" placeholder="ค้นหาทั่วไป...">
+                </div>
+                <button class="btn btn-export flex-shrink-0" onclick="exportDataToExcel()" style="min-width: max-content; border-radius: 14px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  Export
+                </button>
+              </div>
 
-          <!-- คอลัมน์ 2: หมวดหมู่ & ประเภท & สวิตช์ -->
-          <div class="col-lg-5 d-flex flex-wrap flex-xl-nowrap gap-2 align-items-center">
-            <select id="filterCategory" class="filter-box flex-grow-1" style="width: 120px; padding: 10px;">
-              <option value="">- หมวดหมู่ข่าว -</option>
-            </select>
-            <div class="dropdown type-dropdown flex-grow-1" style="width: 120px;">
-              <button class="btn w-100 d-flex justify-content-between align-items-center h-100" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" style="background: #f8fafc; border-color: #e2e8f0; padding: 10px;">
-                <span id="filterTypeBtnText" class="text-truncate">- ประเภทข่าว -</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
-              <ul class="dropdown-menu border-0" id="filterTypeList" style="max-height: 300px; overflow-y: auto;">
-                <li><div class="px-3 py-4 text-muted text-center small">กำลังโหลด...</div></li>
-              </ul>
-            </div>
-            <div class="form-check form-switch d-flex align-items-center mb-0 ms-1 flex-shrink-0">
-              <input class="form-check-input" type="checkbox" id="filterSpecial" value="พระกรณียกิจ" style="width: 2.8em; height: 1.4em;">
-              <label class="form-check-label fw-bold ms-2" for="filterSpecial" style="color: var(--cra-text-main); cursor: pointer; padding-top: 2px;">ข่าวพระกรณียกิจ</label>
+              <!-- คอลัมน์ 2: หมวดหมู่ & สังกัด & ประเภท & สวิตช์ -->
+              <div class="col-xl-6 d-flex flex-wrap flex-md-nowrap gap-2 align-items-center">
+                <select id="filterCategory" class="form-select filter-box flex-grow-1" style="width: 120px; background-color: rgba(248, 250, 252, 0.8);">
+                  <option value="">- หมวดหมู่ข่าว -</option>
+                </select>
+                <select id="filterDepartment" class="form-select filter-box flex-grow-1" style="width: 120px; background-color: rgba(248, 250, 252, 0.8);">
+                  <option value="">- สังกัด -</option>
+                </select>
+                
+                <div class="dropdown type-dropdown flex-grow-1" style="width: 120px;">
+                  <button class="btn w-100 d-flex justify-content-between align-items-center h-100 filter-box" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                    <span id="filterTypeBtnText" class="text-truncate">- ประเภทข่าว -</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <ul class="dropdown-menu border-0 shadow-lg" id="filterTypeList" style="max-height: 300px; overflow-y: auto;">
+                    <li><div class="px-3 py-4 text-muted text-center small">กำลังโหลด...</div></li>
+                  </ul>
+                </div>
+                
+                <div class="form-check form-switch d-flex align-items-center mb-0 ms-1 flex-shrink-0">
+                  <input class="form-check-input" type="checkbox" id="filterSpecial" value="พระกรณียกิจ" style="width: 2.8em; height: 1.4em;">
+                  <label class="form-check-label fw-bold ms-2" for="filterSpecial" style="color: var(--cra-text-main); cursor: pointer; padding-top: 2px;">พระกรณียกิจ</label>
+                </div>
+              </div>
+
+              <!-- คอลัมน์ 3: Global Filter -->
+              <div class="col-xl-3 d-flex flex-wrap flex-sm-nowrap gap-2 align-items-center justify-content-xl-end">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cra-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="d-none d-xxl-block flex-shrink-0" title="ตัวกรองภาพรวม"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                <select id="filterQuarter" class="form-select fw-bold shadow-sm filter-box flex-grow-1" style="color: var(--cra-blue); background-color: #ffffff; min-width: 100px;">
+                  <option value="">- ไตรมาส -</option>
+                </select>
+                <select id="filterMonth" class="form-select fw-bold shadow-sm filter-box flex-grow-1" style="color: var(--cra-orange); background-color: #ffffff; min-width: 100px;">
+                  <option value="">- เดือน -</option>
+                </select>
+              </div>
+
             </div>
           </div>
-
-          <!-- คอลัมน์ 3: Global Filter -->
-          <div class="col-lg-3 d-flex flex-wrap flex-xl-nowrap gap-2 align-items-center justify-content-lg-end">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cra-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="d-none d-xxl-block flex-shrink-0" title="ตัวกรองภาพรวม"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-            <select id="filterQuarter" class="form-select fw-bold border shadow-sm filter-box flex-grow-1" style="color: var(--cra-blue); background-color: #f8fafc; padding: 10px; min-width: 100px;">
-              <option value="">-- ทุกไตรมาส --</option>
-            </select>
-            <select id="filterMonth" class="form-select fw-bold border shadow-sm filter-box flex-grow-1" style="color: var(--cra-orange); background-color: #f8fafc; padding: 10px; min-width: 100px;">
-              <option value="">-- ทุกเดือน --</option>
-            </select>
-          </div>
-
         </div>
       </div>
 
@@ -293,15 +457,23 @@
         </div>
       </div>
 
-      <div class="row mb-4 g-4">
-        <div class="col-md-6">
+      <!-- 🎯 ปรับ Layout เป็น 3 คอลัมน์ (เพิ่มกราฟสังกัดหน่วยงานตรงกลาง) -->
+      <div class="row mb-4 g-4 align-items-stretch">
+        <div class="col-lg-4 col-md-6">
           <div class="cra-card h-100 d-flex flex-column">
             <div class="d-flex justify-content-between align-items-center mb-4"><h6 class="fw-bold mb-0"><i class="bi bi-pie-chart-fill me-2" style="color: var(--cra-blue);"></i> หมวดหมู่ข่าว</h6><span class="card-header-badge" id="badgeCategory">รวมทั้งหมด</span></div>
             <div class="chart-container"><canvas id="categoryChart"></canvas><div class="chart-center-text"><div class="label">ทั้งหมด</div><div class="value" id="categoryTotal">-</div></div></div>
             <div class="chart-legend-container mt-3 flex-grow-1"><div id="categoryLegend"></div></div>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-lg-4 col-md-6">
+          <div class="cra-card h-100 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-4"><h6 class="fw-bold mb-0"><i class="bi bi-building-fill me-2" style="color: var(--cra-green);"></i> สังกัดหน่วยงาน</h6><span class="card-header-badge" id="badgeDepartment">รวมทั้งหมด</span></div>
+            <div class="chart-container"><canvas id="departmentChart"></canvas><div class="chart-center-text"><div class="label">ทั้งหมด</div><div class="value" id="departmentTotal">-</div></div></div>
+            <div class="chart-legend-container mt-3 flex-grow-1"><div id="departmentLegend"></div></div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-12">
           <div class="cra-card h-100 d-flex flex-column">
             <div class="d-flex justify-content-between align-items-center mb-4"><h6 class="fw-bold mb-0"><i class="bi bi-tags-fill me-2" style="color: var(--cra-orange);"></i> ประเภทข่าว</h6><span class="card-header-badge" id="badgeType">รวมทั้งหมด</span></div>
             <div class="chart-container"><canvas id="typeChart"></canvas><div class="chart-center-text"><div class="label">ทั้งหมด</div><div class="value" id="typeTotal">-</div></div></div>
@@ -311,18 +483,26 @@
       </div>
 
       <div class="row mb-5 g-4">
-        <div class="col-md-6">
+        <div class="col-lg-4 col-md-6">
           <div class="cra-card h-100 d-flex flex-column">
             <div class="d-flex justify-content-between align-items-center mb-4"><h6 class="fw-bold mb-0"><i class="bi bi-megaphone-fill me-2" style="color: var(--cra-blue);"></i> ประเภทสื่อที่เผยแพร่</h6></div>
             <div class="d-flex justify-content-between summary-list-header"><div class="d-flex w-75"><div style="width: 50px;">อันดับ</div><div>แหล่งสื่อ</div></div><div class="d-flex" style="width: 120px; justify-content: space-between;"><div>จำนวน</div><div class="text-end">ร้อยละ</div></div></div>
             <div class="summary-list-container flex-grow-1" id="mediaRankingList"></div>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-lg-4 col-md-6">
           <div class="cra-card h-100 d-flex flex-column">
             <div class="d-flex justify-content-between align-items-center mb-4"><h6 class="fw-bold mb-0"><i class="bi bi-journal-bookmark-fill me-2" style="color: var(--cra-orange);"></i> สื่อที่เผยแพร่</h6></div>
             <div class="d-flex justify-content-between summary-list-header"><div class="d-flex w-75"><div style="width: 50px;">อันดับ</div><div>แหล่งข่าว</div></div><div class="d-flex" style="width: 120px; justify-content: space-between;"><div>จำนวน</div><div class="text-end">ร้อยละ</div></div></div>
              <div class="summary-list-container flex-grow-1" id="sourceRankingList"></div>
+          </div>
+        </div>
+        <!-- 🎯 เพิ่มคอลัมน์ตารางจัดอันดับสังกัด -->
+        <div class="col-lg-4 col-md-12">
+          <div class="cra-card h-100 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-4"><h6 class="fw-bold mb-0"><i class="bi bi-building-fill me-2" style="color: var(--cra-green);"></i> สังกัดหน่วยงาน</h6></div>
+            <div class="d-flex justify-content-between summary-list-header"><div class="d-flex w-75"><div style="width: 50px;">อันดับ</div><div>ชื่อสังกัด</div></div><div class="d-flex" style="width: 120px; justify-content: space-between;"><div>จำนวน</div><div class="text-end">ร้อยละ</div></div></div>
+             <div class="summary-list-container flex-grow-1" id="departmentRankingList"></div>
           </div>
         </div>
       </div>
@@ -343,6 +523,8 @@
                 <th style="width: 25%;">โครงการที่เผยแพร่</th>
                 <th style="width: 8%; text-align: center;">พระกรณียกิจ</th>
                 <th style="width: 15%;">หมวดหมู่ข่าว</th>
+                <!-- 🎯 เพิ่มส่วนหัวคอลัมน์ "สังกัด" -->
+                <th style="width: 15%;">สังกัด</th>
                 <th class="text-end pe-4" style="width: 12%;">PR Value</th>
                 <th style="width: 15%;">ประเภท</th>
                 <th style="width: 15%;">แหล่งข่าว</th>
@@ -359,6 +541,50 @@
 
     </div>
 
+    <!-- 🎯 Modal แสดงรายละเอียดข่าวแบบพรีเมียม -->
+    <div class="modal fade" id="newsDetailModal" tabindex="-1" aria-labelledby="newsDetailModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content glass-modal">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold" id="newsDetailModalLabel" style="color: var(--cra-blue);">
+              <i class="bi bi-file-earmark-text-fill me-2" style="color: var(--cra-orange);"></i>รายละเอียดข่าวประชาสัมพันธ์
+            </h5>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h4 id="modalProjectName" class="fw-bold mb-3" style="color: #1e293b; line-height: 1.4;"></h4>
+            
+            <div class="d-flex flex-wrap gap-2 mb-4" id="modalBadges"></div>
+
+            <div class="row g-4 mb-4">
+              <div class="col-sm-6 col-md-4">
+                <div class="detail-label"><i class="bi bi-calendar-event me-1"></i> วันที่เผยแพร่</div>
+                <div class="detail-value" id="modalDate"></div>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="detail-label"><i class="bi bi-cash-stack me-1"></i> PR Value</div>
+                <div class="detail-value pr-value"><span id="modalPrValue"></span> <span style="font-size: 0.8rem; color: #94a3b8; font-weight: normal;">บาท</span></div>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="detail-label"><i class="bi bi-tags me-1"></i> ประเภทสื่อ</div>
+                <div class="detail-value" id="modalType"></div>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="detail-label"><i class="bi bi-journal-text me-1"></i> แหล่งข่าว</div>
+                <div class="detail-value" id="modalSource"></div>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="detail-label"><i class="bi bi-megaphone me-1"></i> สื่อที่เผยแพร่</div>
+                <div class="detail-value" id="modalMedia"></div>
+              </div>
+            </div>
+
+            <div id="modalLinkContainer" class="mt-4 text-center"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
@@ -366,8 +592,8 @@
     
     <script>
       const API_URL = "https://script.google.com/macros/s/AKfycbwqN-9Yhsu9me5F3UxBCiG9HaRSQpxPuRpkHeQOt7KwB6u_0H_wx63nozGCAg7GOJ_L-Q/exec";
-      // 🚀 CACHE CONFIGURATION
-      const CACHE_KEY = "cra_news_cache_freemedia";
+      // 🚀 CACHE CONFIGURATION - เติม _v2 เพื่อบังคับล้างความจำเก่า ดึงคอลัมน์สังกัดใหม่!
+      const CACHE_KEY = "cra_news_cache_freemedia_v2";
       
       const chartColors = ['#1d2b53', '#ea580c', '#eab308', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b', '#0ea5e9', '#f43f5e', '#14b8a6', '#84cc16', '#d946ef', '#f97316', '#06b6d4'];
       let globalData = []; 
@@ -378,7 +604,8 @@
       function exportDataToExcel() {
         if (currentFilteredData.length === 0) { alert("ไม่มีข้อมูลสำหรับดาวน์โหลด"); return; }
         const excelData = currentFilteredData.map((item, index) => {
-          return { "ลำดับ": index + 1, "วันที่เผยแพร่": item.date, "โครงการที่เผยแพร่": item.project_raw, "URL อ้างอิง": item.url || "-", "ข่าวพระกรณียกิจ": item.special.includes("พระกรณียกิจ") ? "ใช่" : "-", "หมวดหมู่ข่าว": item.category, "ประเภท": item.type, "แหล่งข่าว": item.source, "สื่อที่เผยแพร่": item.media, "PR Value (บาท)": item.prValue, "ไตรมาส": item.quarter, "เดือน": item.month };
+          // 🎯 เพิ่มคอลัมน์สังกัดใน Excel
+          return { "ลำดับ": index + 1, "วันที่เผยแพร่": item.date, "โครงการที่เผยแพร่": item.project_raw, "URL อ้างอิง": item.url || "-", "ข่าวพระกรณียกิจ": item.special.includes("พระกรณียกิจ") ? "ใช่" : "-", "หมวดหมู่ข่าว": item.category, "สังกัด": item.department, "ประเภท": item.type, "แหล่งข่าว": item.source, "สื่อที่เผยแพร่": item.media, "PR Value (บาท)": item.prValue, "ไตรมาส": item.quarter, "เดือน": item.month };
         });
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
@@ -432,16 +659,29 @@
       function updateDashboardWidgets(rebuildDropdowns = true) {
         let qFilter = $('#filterQuarter').val(), mFilter = $('#filterMonth').val(), isSpecialChecked = $('#filterSpecial').is(':checked'); 
         let baseFilteredData = globalData.filter(item => (!qFilter || item.quarter === qFilter) && (!mFilter || item.month === mFilter) && (!isSpecialChecked || item.special.includes("พระกรณียกิจ")));
+        
         let currentCat = $('#filterCategory').val();
+        let currentDep = $('#filterDepartment').val(); // 🎯 ดึงค่าตัวกรองสังกัด
         let currentTypes = $('.type-checkbox:checked').map(function() { return this.value; }).get();
 
         if (rebuildDropdowns) {
-            let availableCats = new Set(), availableTypes = new Set();
-            baseFilteredData.forEach(item => { availableCats.add(item.category); if (!currentCat || item.category === currentCat) availableTypes.add(item.type); });
+            let availableCats = new Set(), availableDeps = new Set(), availableTypes = new Set();
+            baseFilteredData.forEach(item => { 
+              availableCats.add(item.category); 
+              availableDeps.add(item.department); // 🎯 เก็บรายการสังกัด
+              if ((!currentCat || item.category === currentCat) && (!currentDep || item.department === currentDep)) {
+                availableTypes.add(item.type); 
+              }
+            });
 
             $('#filterCategory').empty().append('<option value="">- หมวดหมู่ข่าว -</option>');
             [...availableCats].sort().forEach(c => $('#filterCategory').append(new Option(c, c)));
             if(availableCats.has(currentCat)) $('#filterCategory').val(currentCat); else currentCat = ""; 
+
+            // 🎯 วาด Dropdown สังกัด
+            $('#filterDepartment').empty().append('<option value="">- สังกัด -</option>');
+            [...availableDeps].sort().forEach(d => $('#filterDepartment').append(new Option(d, d)));
+            if(availableDeps.has(currentDep)) $('#filterDepartment').val(currentDep); else currentDep = ""; 
 
             let typeListHtml = '';
             [...availableTypes].sort().forEach(t => {
@@ -457,32 +697,45 @@
         let sFilter = $('#customSearch').val().toLowerCase();
         let finalFiltered = baseFilteredData.filter(item => {
             if (currentCat && item.category !== currentCat) return false;
+            if (currentDep && item.department !== currentDep) return false; // 🎯 กรองตามสังกัด
             if (currentTypes.length > 0 && !currentTypes.includes(item.type)) return false;
-            if (sFilter && !`${item.date} ${item.project_raw} ${item.category} ${item.type} ${item.source} ${item.media}`.toLowerCase().includes(sFilter)) return false;
+            if (sFilter) { 
+              let textToSearch = `${item.date} ${item.project_raw} ${item.category} ${item.department} ${item.type} ${item.source} ${item.media}`.toLowerCase(); 
+              if (!textToSearch.includes(sFilter)) return false; 
+            }
             return true;
         });
-
+        
         currentFilteredData = finalFiltered;
+
         $('#sumPR').text(finalFiltered.reduce((sum, item) => sum + item.prValue, 0).toLocaleString('th-TH', {maximumFractionDigits:0}));
         $('#totalNews').text(finalFiltered.length);
-        $('#badgeCategory, #badgeType').text((qFilter || mFilter || currentCat || currentTypes.length > 0 || isSpecialChecked || sFilter) ? "เฉพาะข้อมูลที่กรอง" : "รวมทั้งหมด");
+        
+        // 🎯 อัปเดตข้อความ badge ให้รวมกราฟสังกัดด้วย
+        $('#badgeCategory, #badgeDepartment, #badgeType').text((qFilter || mFilter || currentCat || currentDep || currentTypes.length > 0 || isSpecialChecked || sFilter) ? "เฉพาะข้อมูลที่กรอง" : "รวมทั้งหมด");
 
         renderDonutChart('categoryChart', 'categoryLegend', 'categoryTotal', analyzeObj(finalFiltered, 'category'));
+        // 🎯 เรนเดอร์กราฟโดนัทสำหรับสังกัด
+        renderDonutChart('departmentChart', 'departmentLegend', 'departmentTotal', analyzeObj(finalFiltered, 'department'));
         renderDonutChart('typeChart', 'typeLegend', 'typeTotal', analyzeObj(finalFiltered, 'type'));
         renderRankingList('mediaRankingList', analyzeObj(finalFiltered, 'media'), 20); 
         renderRankingList('sourceRankingList', analyzeObj(finalFiltered, 'source'), 20);
+        // 🎯 เรนเดอร์ตารางจัดอันดับสังกัด
+        renderRankingList('departmentRankingList', analyzeObj(finalFiltered, 'department'), 20);
 
+        // 🎯 อัปเดต Index สำหรับ Column ใน DataTables ให้ตรงกันหลังเพิ่มคอลัมน์สังกัด
         if(datatableInstance) {
-            datatableInstance.column(9).search(qFilter); 
-            datatableInstance.column(10).search(mFilter); 
-            datatableInstance.column(11).search(isSpecialChecked ? "พระกรณียกิจ" : ""); 
+            datatableInstance.column(10).search(qFilter); 
+            datatableInstance.column(11).search(mFilter); 
+            datatableInstance.column(12).search(isSpecialChecked ? "พระกรณียกิจ" : ""); 
             datatableInstance.column(4).search(currentCat); 
-        datatableInstance.column(6).search(currentTypes.length > 0 ? '^(' + currentTypes.map(s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|') + ')$' : '', true, false); 
-        datatableInstance.search(sFilter).draw();
-    }
+            datatableInstance.column(5).search(currentDep); // สังกัดอยู่คอลัมน์ 5
+            datatableInstance.column(7).search(currentTypes.length > 0 ? '^(' + currentTypes.map(s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|') + ')$' : '', true, false); 
+            datatableInstance.search(sFilter).draw();
+        }
 
     // 🎯 5. เพิ่มการคำนวณและอัปเดตข้อความ Header จำนวนข้อมูลแบบ Dynamic (แบบเม็ดยา)
-    let isFiltered = (qFilter || mFilter || currentCat || currentTypes.length > 0 || isSpecialChecked || sFilter);
+    let isFiltered = (qFilter || mFilter || currentCat || currentDep || currentTypes.length > 0 || isSpecialChecked || sFilter);
     let headerHtml = '';
     if (isFiltered) {
         let searchText = sFilter ? ` "<span style="color: #fde047;">${$('#customSearch').val()}</span>"` : '';
@@ -503,22 +756,33 @@
           if(!row[1] && !row[2]) return;
           let date = formatThaiDate(row[1]);
           let projectTextRaw = (row[2] || "").replace(/\\u000A/g, ' ').replace(/\n/g, ' ').replace(/"""/g, '"').replace(/''/g, "'").replace(/^"+|"+$/g, '').trim();
-          let specialCategory = String(row[3] || "").trim(), category = String(row[4] || "").trim() || "ไม่ระบุ", type = String(row[5] || "").trim() || "ไม่ระบุ";
-          let source = String(row[6] || "").trim() || "ไม่ระบุ", media = String(row[7] || "").trim() || "ไม่ระบุ";
-          let prVal = parseFloat(String(row[8]).replace(/,/g, '')) || 0;
-          let quarterVal = String(row[10] || "").trim(), projectUrl = row[11], stdMonth = getStandardMonth(date);
+          
+          let specialCategory = String(row[3] || "").trim();
+          let category = String(row[4] || "").trim() || "ไม่ระบุ";
+          let department = String(row[5] || "").trim() || "ไม่ระบุ"; // 🎯 คอลัมน์ F (สังกัด)
+          let type = String(row[6] || "").trim() || "ไม่ระบุ";       // 🎯 คอลัมน์ G (ประเภท - เลื่อน)
+          let source = String(row[7] || "").trim() || "ไม่ระบุ";     // 🎯 คอลัมน์ H
+          let media = String(row[8] || "").trim() || "ไม่ระบุ";      // 🎯 คอลัมน์ I
+          let prVal = parseFloat(String(row[9]).replace(/,/g, '')) || 0; // 🎯 คอลัมน์ J
+          let quarterVal = String(row[11] || "").trim();            // 🎯 คอลัมน์ L
+          let projectUrl = String(row[13] || row[12] || "").trim(); // 🎯 ดึง URL จาก index 13 (Backend ค้นหามาให้) หรือ 12 (คอลัมน์ M)
+          let stdMonth = getStandardMonth(date);
 
-          if (!projectUrl && projectTextRaw.match(/(https?:\/\/[^\s]+)/)) { projectUrl = projectTextRaw.match(/(https?:\/\/[^\s]+)/)[0]; projectTextRaw = projectTextRaw.replace(projectUrl, '').trim(); }
-
-          globalData.push({ date: date, project_raw: projectTextRaw, url: projectUrl, special: specialCategory, category: category, type: type, source: source, media: media, prValue: prVal, quarter: quarterVal, month: stdMonth });
+          globalData.push({ date: date, project_raw: projectTextRaw, url: projectUrl, special: specialCategory, category: category, department: department, type: type, source: source, media: media, prValue: prVal, quarter: quarterVal, month: stdMonth });
 
           if(quarterVal) quartersForFilter.add(quarterVal);
           if(stdMonth) monthsForFilter.add(stdMonth);
 
-          let projectHtml = projectUrl ? `<div class="mb-2 text-wrap" style="line-height: 1.4;">${projectTextRaw}</div><a href="${projectUrl}" target="_blank" class="btn btn-sm d-inline-flex align-items-center gap-1 shadow-sm" style="background-color: var(--cra-orange); color: white; border-radius: 6px; font-size: 0.75rem; padding: 4px 10px; border: none; text-decoration: none;"><i class="bi bi-box-arrow-up-right"></i> ดูเพิ่มเติม</a>` : projectTextRaw;
+          // 🎯 ห่อข้อความโครงการด้วยคลาส line-clamp-3 เพื่อตัดคำให้เหลือ 3 บรรทัด
+          let clampedText = `<div class="line-clamp-3 mb-2" style="line-height: 1.5;" title="${projectTextRaw}">${projectTextRaw}</div>`;
+          
+          // 🎯 เพิ่ม onclick="event.stopPropagation();" เพื่อป้องกันการคลิกซ้อนกับแถว
+          let projectHtml = projectUrl ? `${clampedText}<a href="${projectUrl}" target="_blank" onclick="event.stopPropagation();" class="btn btn-sm d-inline-flex align-items-center gap-1 shadow-sm" style="background-color: var(--cra-orange); color: white; border-radius: 6px; font-size: 0.75rem; padding: 4px 10px; border: none; text-decoration: none;"><i class="bi bi-box-arrow-up-right"></i> อ่านข่าวคลิกเลย</a>` : clampedText;
+          
           let specialIcon = specialCategory.includes("พระกรณียกิจ") ? `<i class="bi bi-check-circle-fill" style="color: #10b981; font-size: 1.2rem;"></i>` : `<i class="bi bi-x" style="color: #cbd5e1; font-size: 1.5rem;"></i>`;
 
-          tbody += `<tr><td class="text-center text-muted">${index + 1}</td><td class="text-nowrap">${date}</td><td class="fw-medium text-wrap" style="max-width: 250px;">${projectHtml}</td><td class="text-center">${specialIcon}</td><td><span class="badge-category">${category}</span></td><td class="fw-bold text-end pe-4" style="color: var(--cra-blue); font-size: 1.05rem;">${prVal.toLocaleString('th-TH', {maximumFractionDigits:0})} <span style="font-size: 0.75rem; font-weight: normal; color: var(--cra-text-muted); margin-left: 2px;">บาท</span></td><td>${type}</td><td>${source}</td><td class="text-muted">${media}</td><td style="display:none;">${quarterVal}</td><td style="display:none;">${stdMonth}</td><td style="display:none;">${specialCategory}</td></tr>`;
+          // 🎯 เติม onclick ให้กับแถวตาราง และเปลี่ยนคลาสสังกัดเป็น badge-department
+          tbody += `<tr onclick="showNewsDetail(${globalData.length - 1})"><td class="text-center text-muted">${index + 1}</td><td class="text-nowrap">${date}</td><td class="fw-medium text-wrap" style="max-width: 250px;">${projectHtml}</td><td class="text-center">${specialIcon}</td><td><span class="badge-category">${category}</span></td><td><span class="badge-department">${department}</span></td><td class="fw-bold text-end pe-4" style="color: var(--cra-blue); font-size: 1.05rem;">${prVal.toLocaleString('th-TH', {maximumFractionDigits:0})} <span style="font-size: 0.75rem; font-weight: normal; color: var(--cra-text-muted); margin-left: 2px;">บาท</span></td><td>${type}</td><td>${source}</td><td class="text-muted">${media}</td><td style="display:none;">${quarterVal}</td><td style="display:none;">${stdMonth}</td><td style="display:none;">${specialCategory}</td></tr>`;
         }); 
 
         $('#filterQuarter').empty().append('<option value="">-- ทุกไตรมาส --</option>');
@@ -570,6 +834,40 @@
         updateDashboardWidgets(true);
       }
     
+      // 🎯 ฟังก์ชันสำหรับแสดง Modal
+      function showNewsDetail(index) {
+        let data = globalData[index];
+        if (!data) return;
+
+        $('#modalProjectName').text(data.project_raw);
+        
+        let badgesHtml = '';
+        if (data.special.includes("พระกรณียกิจ")) {
+            badgesHtml += `<span class="badge rounded-pill shadow-sm" style="background-color: #10b981; padding: 8px 14px; font-weight: 500;"><i class="bi bi-star-fill me-1"></i> ข่าวพระกรณียกิจ</span>`;
+        }
+        badgesHtml += `<span class="badge rounded-pill shadow-sm" style="background-color: rgba(29, 43, 83, 0.1); color: var(--cra-blue); padding: 8px 14px; font-weight: 600;"><i class="bi bi-folder2 me-1"></i> ${data.category}</span>`;
+        if (data.department !== "ไม่ระบุ") {
+            badgesHtml += `<span class="badge rounded-pill border shadow-sm text-dark" style="background-color: #f8fafc; padding: 8px 14px; font-weight: 500;"><i class="bi bi-building me-1"></i> ${data.department}</span>`;
+        }
+        
+        $('#modalBadges').html(badgesHtml);
+        $('#modalDate').text(data.date);
+        $('#modalPrValue').text(data.prValue.toLocaleString('th-TH', {maximumFractionDigits:0}));
+        $('#modalType').text(data.type);
+        $('#modalSource').text(data.source);
+        $('#modalMedia').text(data.media);
+
+        if (data.url) {
+            $('#modalLinkContainer').html(`<a href="${data.url}" target="_blank" class="btn btn-lg w-100 shadow-sm" style="background: linear-gradient(135deg, var(--cra-orange) 0%, #f97316 100%); color: white; border-radius: 16px; font-weight: 600; transition: transform 0.2s;"><i class="bi bi-box-arrow-up-right me-2"></i>เปิดอ่านข่าวต้นฉบับ</a>`);
+        } else {
+            $('#modalLinkContainer').html(`<button class="btn btn-lg w-100 btn-light text-muted" disabled style="border-radius: 16px; font-weight: 600; background-color: #f1f5f9;"><i class="bi bi-dash-circle me-2"></i>ไม่มีลิงก์ข่าวต้นฉบับ</button>`);
+        }
+
+        let modalEl = document.getElementById('newsDetailModal');
+        let modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.show();
+      }
+
     $(document).ready(function() {
         // อนิเมชั่นหลอกๆ สำหรับหน้าโหลดดิ้ง
         let progress = 15;
@@ -577,7 +875,7 @@
         const hideLoader = () => { clearInterval(progressInterval); $('#progressBar').css('width', '100%'); $('#progressText').text('100'); setTimeout(() => $('#loader-wrapper').addClass('loader-hidden'), 300); }
 
         // Event Listeners (ใส่ครั้งเดียวตอนโหลดหน้า)
-        $('#filterQuarter, #filterMonth, #filterCategory, #filterSpecial').on('change', () => updateDashboardWidgets(true));
+        $('#filterQuarter, #filterMonth, #filterCategory, #filterDepartment, #filterSpecial').on('change', () => updateDashboardWidgets(true));
         $(document).on('change', '.type-checkbox', () => updateDashboardWidgets(false));
         $('#customSearch').on('keyup', () => updateDashboardWidgets(false));
 
