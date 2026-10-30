@@ -137,6 +137,55 @@
       #update-toast { position: fixed; bottom: 20px; right: 20px; background-color: #059669; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); z-index: 9999; transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); pointer-events: none; }
       #update-toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
 
+      /* 🎯 โค้ดปรับแก้ตารางให้คลิกได้ */
+      .cra-table tbody tr { cursor: pointer; transition: background-color 0.2s; }
+      .cra-table tbody tr:hover { background-color: #f1f5f9; }
+
+      /* 🎯 Modal Design (Glassmorphism) */
+      .glass-modal {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+      }
+      .glass-modal .modal-header {
+        border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        background: rgba(248, 250, 252, 0.5);
+        padding: 20px 24px;
+      }
+      .glass-modal .modal-body {
+        padding: 30px 24px;
+      }
+      .detail-label {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+      .detail-value {
+        font-size: 1rem;
+        color: #334155;
+        font-weight: 500;
+      }
+      .detail-value.pr-value {
+        font-size: 1.35rem;
+        color: var(--cra-green);
+        font-weight: 800;
+      }
+
+      /* 🎯 คลาสสำหรับตัดคำให้อยู่ใน 3 บรรทัด (พร้อมจุดไข่ปลา ...) */
+      .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
       @media (max-width: 768px) {
         .cra-table th, .cra-table td { padding: 10px 12px; font-size: 0.85rem; }
         .justify-content-lg-end { justify-content: flex-start !important; }
@@ -154,10 +203,14 @@
     <div id="update-toast">✅ อัปเดตข้อมูลล่าสุดเรียบร้อยแล้ว <a href="#" onclick="location.reload();" style="color: #6ee7b7; margin-left: 10px;">รีเฟรชหน้าเว็บ</a></div>
 
     <div class="container-fluid py-4 px-md-5">
-      <div class="top-nav">
-        <a href="index.html" class="btn-back"><i class="bi bi-arrow-left"></i> กลับหน้าหลัก</a>
-        <span class="nav-divider">↹</span>
-        <span class="text-muted" style="font-size: 0.9rem;">Dashboard บริการวิชาการสื่อวิทยุ</span>
+      <div class="top-nav justify-content-between align-items-center">
+        <div>
+          <a href="index.html" class="btn-back"><i class="bi bi-arrow-left"></i> กลับหน้าหลัก</a>
+          <span class="nav-divider d-none d-sm-inline">↹</span>
+          <span class="text-muted d-none d-sm-inline" style="font-size: 0.9rem;">Dashboard บริการวิชาการสื่อวิทยุ</span>
+        </div>
+        <!-- 🎯 เปลี่ยนโลโก้ใหม่ มุมขวาบน -->
+        <img src="https://s.imgz.io/2026/10/30/cra-prfe57217485806239.png" alt="CRA Logo" style="height: 100px; width: auto; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));" onerror="this.style.display='none'">
       </div>
 
       <!-- 🎯 1. ส่วน Header เม็ดยา (Pill) -->
@@ -271,6 +324,48 @@
             </thead>
             <tbody></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 Modal แสดงรายละเอียดข่าวแบบพรีเมียม -->
+    <div class="modal fade" id="newsDetailModal" tabindex="-1" aria-labelledby="newsDetailModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content glass-modal">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold" id="newsDetailModalLabel" style="color: var(--cra-green);">
+              <i class="bi bi-mic-fill me-2" style="color: var(--cra-blue);"></i>รายละเอียดบริการวิชาการสื่อวิทยุ
+            </h5>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h4 id="modalProjectName" class="fw-bold mb-3" style="color: #1e293b; line-height: 1.4;"></h4>
+            
+            <div class="row g-4 mb-4">
+              <div class="col-sm-6 col-md-4">
+                <div class="detail-label"><i class="bi bi-calendar-event me-1"></i> วันที่ออกอากาศ</div>
+                <div class="detail-value" id="modalDate"></div>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="detail-label"><i class="bi bi-cash-stack me-1"></i> PR Value</div>
+                <div class="detail-value pr-value"><span id="modalPrValue"></span> <span style="font-size: 0.8rem; color: #94a3b8; font-weight: normal;">บาท</span></div>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="detail-label"><i class="bi bi-broadcast me-1"></i> ช่องที่ออกอากาศ</div>
+                <div class="detail-value" id="modalChannel"></div>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="detail-label"><i class="bi bi-collection-play me-1"></i> รายการ</div>
+                <div class="detail-value" id="modalProgram"></div>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <div class="detail-label"><i class="bi bi-person-workspace me-1"></i> แพทย์ที่ให้สัมภาษณ์</div>
+                <div class="detail-value" id="modalDoctor"></div>
+              </div>
+            </div>
+
+            <div id="modalLinkContainer" class="mt-4 text-center"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -466,15 +561,14 @@
             prValue: prVal, quarter: quarterVal, month: stdMonth 
           });
 
-          let titleHtml = title;
-          if(projectUrl && String(projectUrl).includes('http')) {
-             titleHtml = `<div class="mb-2 text-wrap" style="line-height: 1.4;">${title}</div><a href="${projectUrl}" target="_blank" class="badge bg-success text-decoration-none shadow-sm py-2 px-3" style="background-color: var(--cra-green) !important;"><i class="bi bi-headphones"></i> ฟังรายการ</a>`;
-          }
+          let clampedText = `<div class="line-clamp-3 mb-2" style="line-height: 1.5;" title="${title}">${title}</div>`;
+
+          let titleHtml = projectUrl && String(projectUrl).includes('http') ? `${clampedText}<a href="${projectUrl}" target="_blank" onclick="event.stopPropagation();" class="badge bg-success text-decoration-none shadow-sm py-2 px-3" style="background-color: var(--cra-green) !important;"><i class="bi bi-headphones"></i> ฟังรายการ</a>` : clampedText;
 
           if(quarterVal) quartersForFilter.add(quarterVal);
           if(stdMonth) monthsForFilter.add(stdMonth);
 
-          tbody += `<tr>
+          tbody += `<tr onclick="showNewsDetail(${globalData.length - 1})">
             <td class="text-center text-muted">${index + 1}</td>
             <td>${date}</td>
             <td class="fw-medium text-wrap" style="max-width: 250px;">${titleHtml}</td>
@@ -535,6 +629,29 @@
         });
 
         updateDashboardWidgets(true);
+      }
+
+      // 🎯 ฟังก์ชันสำหรับแสดง Modal
+      function showNewsDetail(index) {
+        let data = globalData[index];
+        if (!data) return;
+
+        $('#modalProjectName').text(data.title);
+        $('#modalDate').text(data.date);
+        $('#modalPrValue').text(data.prValue.toLocaleString('th-TH', {maximumFractionDigits:0}));
+        $('#modalChannel').text(data.channel);
+        $('#modalProgram').text(data.program);
+        $('#modalDoctor').text(data.doctor || "-");
+
+        if (data.url) {
+            $('#modalLinkContainer').html(`<a href="${data.url}" target="_blank" class="btn btn-lg w-100 shadow-sm" style="background: linear-gradient(135deg, var(--cra-green) 0%, #059669 100%); color: white; border-radius: 16px; font-weight: 600; transition: transform 0.2s;"><i class="bi bi-headphones me-2"></i>ฟังรายการคลิกเลย</a>`);
+        } else {
+            $('#modalLinkContainer').html(`<button class="btn btn-lg w-100 btn-light text-muted" disabled style="border-radius: 16px; font-weight: 600; background-color: #f1f5f9;"><i class="bi bi-dash-circle me-2"></i>ไม่มีลิงก์รับฟังรายการ</button>`);
+        }
+
+        let modalEl = document.getElementById('newsDetailModal');
+        let modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.show();
       }
 
       $(document).ready(function() {
