@@ -92,9 +92,12 @@
 
       .form-switch .form-check-input { cursor: pointer; width: 2.5em; height: 1.25em; }
       .form-switch .form-check-input:checked { background-color: var(--cra-blue); border-color: var(--cra-blue); }
-      .badge-category { background: rgba(29, 43, 83, 0.1); color: var(--cra-blue); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-      /* 🎯 เพิ่มสไตล์สำหรับป้ายสังกัดให้เป็นทรงเม็ดยาแบบพรีเมียม */
-      .badge-department { background: #f1f5f9; color: #475569; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+      
+      /* 🎯 ปรับให้เป็นทรงเม็ดยาโค้งมนสมบูรณ์ (50px) */
+      .badge-category { background: rgba(29, 43, 83, 0.1); color: var(--cra-blue); padding: 6px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
+      
+      /* 🎯 สไตล์สำหรับป้ายสังกัด ทรงเม็ดยามีขอบบางๆ แบบพรีเมียม */
+      .badge-department { background: rgba(241, 245, 249, 0.8); color: #475569; padding: 6px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; border: 1px solid #e2e8f0; }
 
       .chart-container { position: relative; height: 250px; width: 100%; margin-bottom: 20px;}
       .chart-center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
@@ -213,9 +216,9 @@
       }
       @media (min-width: 1200px) {
         .sticky-desktop {
-          position: sticky;
+          position: sticky !important;
           top: 20px;
-          z-index: 1040;
+          z-index: 1040 !important;
         }
       }
       
@@ -365,7 +368,7 @@
       </div>
 
       <!-- 🎯 2. ตัวกรองภาพรวม (Desktop = Sticky ลอยตัวสวยงาม, Mobile = สไลด์ขึ้นจากล่าง) -->
-      <div class="offcanvas-xl offcanvas-bottom rounded-top-4 shadow-lg" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel" style="max-height: 85vh; z-index: 1060;">
+      <div class="offcanvas-xl offcanvas-bottom rounded-top-4 shadow-lg sticky-desktop" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel" style="max-height: 85vh; z-index: 1060;">
         <div class="offcanvas-header bg-light border-bottom d-xl-none py-3">
           <h5 class="offcanvas-title fw-bold" id="filterOffcanvasLabel" style="color: var(--cra-blue);"><i class="bi bi-sliders me-2"></i> ตัวกรองข้อมูล</h5>
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
@@ -373,7 +376,7 @@
         <div class="offcanvas-body p-4 p-xl-0 overflow-visible">
           
           <!-- Command Center Panel -->
-          <div class="cra-command-center sticky-desktop w-100 mb-xl-4">
+          <div class="cra-command-center w-100 mb-xl-4">
             <div class="row g-3 align-items-center">
               
               <!-- คอลัมน์ 1: ค้นหา & Export -->
