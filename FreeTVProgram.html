@@ -59,13 +59,36 @@
       }
       .cra-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(47, 60, 90, 0.08); }
 
-      /* ตัวกรอง (Filter) */
-      .filter-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 16px; font-size: 0.9rem; color: var(--cra-text-main); outline: none; transition: 0.2s;}
-      .filter-box:focus { border-color: var(--cra-orange); box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1); }
-      select.filter-box { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+      /* 🎯 Modern Inputs Design */
+      .filter-box { 
+        background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; 
+        padding: 12px 18px; font-size: 0.95rem; color: var(--cra-text-main); 
+        outline: none; transition: all 0.25s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      }
+      .filter-box:hover { border-color: #cbd5e1; background: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+      .filter-box:focus { background: #ffffff; border-color: var(--cra-blue); box-shadow: 0 0 0 4px rgba(29, 43, 83, 0.1); }
+      
+      select.filter-box {
+        appearance: none !important; -webkit-appearance: none !important; -moz-appearance: none !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important; background-position: right 14px center !important;
+        background-size: 16px !important; padding-right: 36px !important; cursor: pointer;
+      }
 
-      .search-group .input-group-text { border-radius: 12px 0 0 12px; border-color: #e2e8f0; }
-      .search-group input { border-radius: 0 12px 12px 0; }
+      .search-group .input-group-text { border-radius: 14px 0 0 14px; background: #ffffff; border: 1px solid #e2e8f0; border-right: none; }
+      .search-group input.filter-box { border-radius: 0 14px 14px 0; border-left: none; }
+      
+      /* 🎯 Custom Dropdown Styles */
+      .custom-filter-dropdown { width: 100%; }
+      .custom-filter-dropdown .btn { border: 1px solid #e2e8f0; background: #f8fafc; color: var(--cra-text-main); font-size: 0.9rem; border-radius: 14px; padding: 10px 16px; text-align: left; transition: 0.2s; }
+      .custom-filter-dropdown .btn:hover, .custom-filter-dropdown .btn:focus { border-color: var(--cra-blue); background: #ffffff; box-shadow: 0 0 0 3px rgba(29, 43, 83, 0.1); }
+      .custom-filter-dropdown .dropdown-menu { border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); padding: 0; overflow: hidden; z-index: 1060; }
+      .custom-filter-dropdown .dropdown-item { white-space: normal !important; word-wrap: break-word; }
+      .custom-filter-dropdown .custom-check-label { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; cursor: pointer; width: 100%; transition: background-color 0.2s; margin-bottom: 0; white-space: normal !important; }
+      .custom-filter-dropdown li:last-child .custom-check-label { border-bottom: none; } 
+      .custom-filter-dropdown .custom-check-label:hover { background-color: #f8fafc; }
+      .custom-filter-dropdown .form-check-input { cursor: pointer; width: 1.25rem; height: 1.25rem; margin-top: 0.15rem; }
+      @media (min-width: 769px) { .custom-filter-dropdown .dropdown-menu { min-width: 320px !important; white-space: normal; } }
       
       /* ปุ่ม Export Excel */
       .btn-export { background-color: #10b981; color: white; border: none; border-radius: 12px; padding: 10px 16px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2); transition: 0.3s; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
@@ -193,7 +216,34 @@
         text-overflow: ellipsis;
       }
 
+      /* 🎯 Modern 2026 Command Center (Sticky Filter) */
+      .cra-command-center { transition: all 0.3s ease; padding: 0; background: transparent; }
+      @media (min-width: 1200px) {
+        .cra-command-center {
+          background: rgba(29, 43, 83, 0.95); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+          border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 24px; padding: 20px 24px;
+          box-shadow: 0 10px 30px rgba(29, 43, 83, 0.25); 
+        }
+        .sticky-desktop { position: sticky !important; top: 20px; z-index: 1040 !important; }
+      }
+      .responsive-text { color: var(--cra-text-main) !important; }
+      .responsive-icon { stroke: var(--cra-text-muted) !important; }
+      @media (min-width: 1200px) {
+        .responsive-text { color: white !important; }
+        .responsive-icon { stroke: white !important; }
+      }
+
+      /* 🎯 Mobile Floating Action Button (FAB) */
+      .mobile-fab-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 1030; width: 90%; max-width: 350px; }
+      .mobile-fab-btn { background: rgba(29, 43, 83, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: white; border-radius: 50px; font-weight: 600; font-size: 1.05rem; padding: 14px 24px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 12px 24px rgba(29, 43, 83, 0.3); display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%; transition: transform 0.2s; }
+      .mobile-fab-btn:active { transform: scale(0.96); }
+
+      /* 🎯 พื้นหลังเมนูสไลด์บนมือถือ */
+      .mobile-offcanvas-bg { background-color: #ffffff; border-top-left-radius: 24px; border-top-right-radius: 24px; }
+      @media (min-width: 1200px) { .mobile-offcanvas-bg { background-color: transparent !important; border-radius: 0 !important; } }
+
       @media (max-width: 768px) {
+        .custom-filter-dropdown, select.filter-box, .search-group { width: 100% !important; margin-bottom: 5px; }
         .cra-table th, .cra-table td { padding: 10px 12px; font-size: 0.85rem; }
         .justify-content-lg-end { justify-content: flex-start !important; }
         .btn-export { width: 100%; justify-content: center; }
@@ -221,49 +271,78 @@
       </div>
 
       <!-- 🎯 1. ส่วน Header เปลี่ยนเป็นแบบเม็ดยา (Pill) สีสันสวยงาม -->
-      <div class="text-center mb-4 mt-3" id="mainDataHeader">
+      <div class="text-center mb-4 mt-3 position-relative" style="z-index: 1;" id="mainDataHeader">
         <div class="data-pill">กำลังโหลดข้อมูล...</div>
       </div>
 
-      <!-- 🎯 2. ตัวกรองแบบ 1 แถว 3 คอลัมน์ (Global Filter Panel) -->
-      <div class="cra-card mb-4" style="padding: 16px 24px;">
-        <div class="row g-3 align-items-center">
-          
-          <!-- คอลัมน์ 1: ค้นหา & Export -->
-          <div class="col-lg-4 d-flex flex-wrap flex-xl-nowrap gap-2">
-            <div class="input-group search-group flex-grow-1" style="width: auto; min-width: 150px;">
-              <span class="input-group-text bg-white border-end-0 ps-3">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              </span>
-              <input type="text" id="customSearch" class="form-control filter-box border-start-0 ps-2 m-0 shadow-none" placeholder="ค้นหาทั่วไป..." style="border-radius: 0 12px 12px 0;">
+      <!-- 🎯 Mobile Floating Button -->
+      <div class="d-xl-none mobile-fab-container">
+        <button class="btn mobile-fab-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
+            <i class="bi bi-sliders"></i> ค้นหาและกรองข้อมูลข่าว
+        </button>
+      </div>
+
+      <!-- 🎯 2. ตัวกรองภาพรวม (Desktop = Sticky ลอยตัวสวยงาม, Mobile = สไลด์ขึ้นจากล่าง) -->
+      <div class="sticky-desktop">
+        <div class="offcanvas-xl offcanvas-bottom mobile-offcanvas-bg" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel" style="height: auto; max-height: 85vh;">
+          <div class="offcanvas-header bg-light border-bottom d-xl-none py-3 px-4" style="border-top-left-radius: 24px; border-top-right-radius: 24px;">
+            <h5 class="offcanvas-title fw-bold" id="filterOffcanvasLabel" style="color: var(--cra-orange);"><i class="bi bi-sliders me-2"></i> ค้นหาและกรองข้อมูล</h5>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" data-bs-target="#filterOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body p-4 p-xl-0">
+            
+            <!-- Command Center Panel -->
+            <div class="row g-3 align-items-center justify-content-between">
+              
+              <!-- 🎯 คอลัมน์ 1: ค้นหา & Export -->
+              <div class="col-xl-4 d-flex flex-column flex-xl-row gap-2">
+                <div class="input-group search-group flex-grow-1">
+                  <span class="input-group-text">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  </span>
+                  <input type="text" id="customSearch" class="form-control filter-box ps-2 m-0 shadow-none" placeholder="ค้นหาทั่วไป...">
+                </div>
+                <button class="btn btn-export flex-shrink-0 justify-content-center" onclick="exportDataToExcel()" style="border-radius: 14px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  Export
+                </button>
+              </div>
+
+              <!-- 🎯 คอลัมน์ 2: สถานี & รายการ (Custom Dropdown) -->
+              <div class="col-xl-4 d-flex flex-column flex-xl-row gap-2 align-items-xl-center">
+                <div class="dropdown custom-filter-dropdown w-100">
+                  <button class="btn w-100 d-flex justify-content-between align-items-center h-100 filter-box shadow-none" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                    <span id="filterStationBtnText" class="text-truncate">- สถานีโทรทัศน์ -</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <ul class="dropdown-menu border-0 shadow-lg w-100" id="filterStationList" style="max-height: 300px; overflow-y: auto;">
+                    <li><div class="px-3 py-4 text-muted text-center small">กำลังโหลด...</div></li>
+                  </ul>
+                </div>
+                
+                <div class="dropdown custom-filter-dropdown w-100">
+                  <button class="btn w-100 d-flex justify-content-between align-items-center h-100 filter-box shadow-none" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                    <span id="filterProgramBtnText" class="text-truncate">- รายการ -</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <ul class="dropdown-menu border-0 shadow-lg w-100" id="filterProgramList" style="max-height: 300px; overflow-y: auto;">
+                    <li><div class="px-3 py-4 text-muted text-center small">กำลังโหลด...</div></li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- 🎯 คอลัมน์ 3: ไตรมาส & เดือน -->
+              <div class="col-xl-4 d-flex flex-column flex-xl-row gap-2 align-items-xl-center justify-content-xl-end">
+                <select id="filterQuarter" class="fw-bold shadow-sm filter-box w-100" style="color: var(--cra-blue);">
+                  <option value="">- ไตรมาส -</option>
+                </select>
+                <select id="filterMonth" class="fw-bold shadow-sm filter-box w-100" style="color: var(--cra-orange);">
+                  <option value="">- เดือน -</option>
+                </select>
+              </div>
+
             </div>
-            <button class="btn btn-export flex-shrink-0" onclick="exportDataToExcel()" style="min-width: max-content;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-              Export
-            </button>
           </div>
-
-          <!-- คอลัมน์ 2: หมวดหมู่สถานี & รายการ -->
-          <div class="col-lg-5 d-flex flex-wrap flex-xl-nowrap gap-2 align-items-center">
-            <select id="filterStation" class="filter-box flex-grow-1" style="padding: 10px;">
-              <option value="">- สถานีโทรทัศน์ -</option>
-            </select>
-            <select id="filterProgram" class="filter-box flex-grow-1" style="padding: 10px;">
-              <option value="">- รายการ -</option>
-            </select>
-          </div>
-
-          <!-- คอลัมน์ 3: Global Filter (ไตรมาส & เดือน) -->
-          <div class="col-lg-3 d-flex flex-wrap flex-xl-nowrap gap-2 align-items-center justify-content-lg-end">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cra-orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="d-none d-xxl-block flex-shrink-0" title="ตัวกรองภาพรวม"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-            <select id="filterQuarter" class="form-select fw-bold border shadow-sm filter-box flex-grow-1" style="color: var(--cra-blue); background-color: #f8fafc; padding: 10px; min-width: 100px;">
-              <option value="">-- ทุกไตรมาส --</option>
-            </select>
-            <select id="filterMonth" class="form-select fw-bold border shadow-sm filter-box flex-grow-1" style="color: var(--cra-orange); background-color: #f8fafc; padding: 10px; min-width: 100px;">
-              <option value="">-- ทุกเดือน --</option>
-            </select>
-          </div>
-
         </div>
       </div>
 
@@ -382,6 +461,8 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- 🎯 เพิ่มสคริปต์ Bootstrap กลับมาเพื่อให้ระบบ Popup และ Offcanvas ทำงานได้ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     
@@ -469,8 +550,8 @@
             return true;
         });
 
-        let currentStation = $('#filterStation').val();
-        let currentProgram = $('#filterProgram').val();
+        let currentStations = $('.station-checkbox:checked').map(function() { return this.value; }).get();
+        let currentPrograms = $('.program-checkbox:checked').map(function() { return this.value; }).get();
 
         if (rebuildDropdowns) {
             let availableStations = new Set();
@@ -478,26 +559,36 @@
             
             baseFilteredData.forEach(item => {
                 availableStations.add(item.station);
-                if (currentStation && item.station !== currentStation) return;
-                availablePrograms.add(item.program);
+                if (currentStations.length === 0 || currentStations.includes(item.station)) {
+                    availablePrograms.add(item.program);
+                }
             });
 
-            $('#filterStation').empty().append('<option value="">- สถานีโทรทัศน์ -</option>');
-            [...availableStations].sort().forEach(s => $('#filterStation').append(new Option(s, s)));
-            if(availableStations.has(currentStation)) { $('#filterStation').val(currentStation); } else { currentStation = ""; }
+            let stationListHtml = '';
+            [...availableStations].sort().forEach(s => {
+               let isChecked = currentStations.includes(s) ? 'checked' : '';
+               let safeValue = String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+               stationListHtml += `<li><label class="dropdown-item d-flex align-items-start custom-check-label"><input class="form-check-input station-checkbox me-3 flex-shrink-0" type="checkbox" value="${safeValue}" ${isChecked}><span class="flex-grow-1" style="line-height: 1.4; color: #334155; font-size: 0.9rem;">${s}</span></label></li>`;
+            });
+            $('#filterStationList').html(availableStations.size === 0 ? '<li><div class="px-3 py-4 text-muted text-center small">ไม่พบสถานี</div></li>' : stationListHtml);
 
-            $('#filterProgram').empty().append('<option value="">- รายการ -</option>');
-            [...availablePrograms].sort().forEach(p => $('#filterProgram').append(new Option(p, p)));
-            if(availablePrograms.has(currentProgram)) { $('#filterProgram').val(currentProgram); } else { currentProgram = ""; }
+            let programListHtml = '';
+            [...availablePrograms].sort().forEach(p => {
+               let isChecked = currentPrograms.includes(p) ? 'checked' : '';
+               let safeValue = String(p).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+               programListHtml += `<li><label class="dropdown-item d-flex align-items-start custom-check-label"><input class="form-check-input program-checkbox me-3 flex-shrink-0" type="checkbox" value="${safeValue}" ${isChecked}><span class="flex-grow-1" style="line-height: 1.4; color: #334155; font-size: 0.9rem;">${p}</span></label></li>`;
+            });
+            $('#filterProgramList').html(availablePrograms.size === 0 ? '<li><div class="px-3 py-4 text-muted text-center small">ไม่พบรายการ</div></li>' : programListHtml);
         }
 
-        let stFilter = $('#filterStation').val(); 
-        let pFilter = $('#filterProgram').val(); 
+        $('#filterStationBtnText').text(currentStations.length === 0 ? '- สถานีโทรทัศน์ -' : `- เลือกแล้ว (${currentStations.length}) -`).css({'color': currentStations.length === 0 ? 'var(--cra-text-main)' : 'var(--cra-orange)', 'font-weight': currentStations.length === 0 ? 'normal' : '700'});
+        $('#filterProgramBtnText').text(currentPrograms.length === 0 ? '- รายการ -' : `- เลือกแล้ว (${currentPrograms.length}) -`).css({'color': currentPrograms.length === 0 ? 'var(--cra-text-main)' : 'var(--cra-orange)', 'font-weight': currentPrograms.length === 0 ? 'normal' : '700'});
+
         let sFilter = $('#customSearch').val().toLowerCase();
 
         let finalFiltered = baseFilteredData.filter(item => {
-            if (stFilter && item.station !== stFilter) return false;
-            if (pFilter && item.program !== pFilter) return false;
+            if (currentStations.length > 0 && !currentStations.includes(item.station)) return false;
+            if (currentPrograms.length > 0 && !currentPrograms.includes(item.program)) return false;
             if (sFilter) { 
               let textToSearch = `${item.date} ${item.title} ${item.station} ${item.program} ${item.interview}`.toLowerCase(); 
               if (!textToSearch.includes(sFilter)) return false; 
@@ -511,7 +602,7 @@
         $('#sumPR').text(sumPr.toLocaleString('th-TH', {maximumFractionDigits:0}));
         $('#totalNews').text(finalFiltered.length);
 
-        let statusText = (qFilter || mFilter || stFilter || pFilter || sFilter) ? "เฉพาะข้อมูลที่กรอง" : "รวมทั้งหมด";
+        let statusText = (qFilter || mFilter || currentStations.length > 0 || currentPrograms.length > 0 || sFilter) ? "เฉพาะข้อมูลที่กรอง" : "รวมทั้งหมด";
         $('#badgeStation, #badgeProgram').text(statusText);
 
         renderDonutChart('stationChart', 'stationLegend', 'stationTotal', analyzeObj(finalFiltered, 'station'));
@@ -520,13 +611,13 @@
         if(datatableInstance) {
           datatableInstance.column(7).search(qFilter); 
           datatableInstance.column(8).search(mFilter);
-          datatableInstance.column(3).search(stFilter); 
-          datatableInstance.column(4).search(pFilter); 
+          datatableInstance.column(3).search(currentStations.length > 0 ? '^(' + currentStations.map(s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|') + ')$' : '', true, false); 
+          datatableInstance.column(4).search(currentPrograms.length > 0 ? '^(' + currentPrograms.map(s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|') + ')$' : '', true, false); 
           datatableInstance.search(sFilter).draw();
         }
 
         // 🎯 5. อัปเดตข้อความ Header จำนวนข้อมูลแบบ Dynamic (แบบเม็ดยา)
-        let isFiltered = (qFilter || mFilter || stFilter || pFilter || sFilter);
+        let isFiltered = (qFilter || mFilter || currentStations.length > 0 || currentPrograms.length > 0 || sFilter);
         let headerHtml = '';
         if (isFiltered) {
             let searchText = sFilter ? ` "<span style="color: #fde047;">${$('#customSearch').val()}</span>"` : '';
@@ -669,7 +760,8 @@
         let progressInterval = setInterval(() => { if(progress < 90) { progress += Math.floor(Math.random() * 5)+2; $('#progressBar').css('width', progress + '%'); $('#progressText').text(progress); } }, 150); 
         const hideLoader = () => { clearInterval(progressInterval); $('#progressBar').css('width', '100%'); $('#progressText').text('100'); setTimeout(() => $('#loader-wrapper').addClass('loader-hidden'), 300); }
 
-        $('#filterQuarter, #filterMonth, #filterStation, #filterProgram').on('change', () => updateDashboardWidgets(true));
+        $('#filterQuarter, #filterMonth').on('change', () => updateDashboardWidgets(true));
+        $(document).on('change', '.station-checkbox, .program-checkbox', () => updateDashboardWidgets(false));
         $('#customSearch').on('keyup', () => updateDashboardWidgets(false));
 
         // 🚀 ระบบจัดการ Cache (Stale-while-revalidate) สำหรับ FreeTVProgram
