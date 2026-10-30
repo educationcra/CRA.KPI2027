@@ -211,7 +211,8 @@
         border: 1px solid rgba(255, 255, 255, 0.8);
         border-radius: 24px;
         padding: 20px 24px;
-        box-shadow: 0 15px 35px -5px rgba(29, 43, 83, 0.08), inset 0 1px 0 rgba(255,255,255,1);
+        /* 🎯 ปรับเงาให้บางเบาที่สุด ดูเนียนตาและคลีนขึ้น */
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.03);
         transition: all 0.3s ease;
       }
       @media (min-width: 1200px) {
@@ -368,7 +369,8 @@
       </div>
 
       <!-- 🎯 2. ตัวกรองภาพรวม (Desktop = Sticky ลอยตัวสวยงาม, Mobile = สไลด์ขึ้นจากล่าง) -->
-      <div class="offcanvas-xl offcanvas-bottom rounded-top-4 shadow-lg sticky-desktop" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel" style="max-height: 85vh; z-index: 1060;">
+      <!-- 🎯 ลบคลาส shadow-lg ออก เพื่อไม่ให้เงาแข็งและหลอกตา -->
+      <div class="offcanvas-xl offcanvas-bottom rounded-top-4 sticky-desktop" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel" style="max-height: 85vh; z-index: 1060;">
         <div class="offcanvas-header bg-light border-bottom d-xl-none py-3">
           <h5 class="offcanvas-title fw-bold" id="filterOffcanvasLabel" style="color: var(--cra-blue);"><i class="bi bi-sliders me-2"></i> ตัวกรองข้อมูล</h5>
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
