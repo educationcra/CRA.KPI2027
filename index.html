@@ -11,7 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-    
+
     <style>
       body { 
         background-color: #f8faff; 
@@ -25,9 +25,19 @@
         min-height: 100vh;
       }
       
-      /* 🎯 ปรับความเร็วอนิเมชันให้เด้งไวขึ้นจาก 0.8s เป็น 0.4s */
+      /* Speed update 0.8s -> 0.4s */
       .fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; opacity: 0; transform: translateY(20px); }
       @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+      /* White circle logo */
+      .logo-container {
+         display: inline-flex; justify-content: center; align-items: center;
+         background: rgba(255, 255, 255, 0.95);
+         width: 120px; height: 120px; border-radius: 50%;
+         box-shadow: 0 15px 35px rgba(30, 58, 138, 0.1), inset 0 0 0 4px rgba(255,255,255,1);
+         margin-bottom: 1.5rem; position: relative; z-index: 10;
+      }
+      .logo-container img { width: 80px; height: auto; object-fit: contain; }
 
       .main-title { font-size: 3.8rem; font-weight: 800; background: linear-gradient(135deg, #1e3a8a 0%, #4338ca 50%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1.5px; display: inline-block; margin-bottom: 0.2rem; }
       .main-title::after { content: '.'; color: #ea580c; -webkit-text-fill-color: #ea580c; }
@@ -44,6 +54,7 @@
       .total-unit { font-size: 1.5rem; font-weight: 500; color: #64748b; margin-left: 12px; }
       .badge-premium { background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important; color: #ffffff !important; border: none; font-size: 1rem; font-weight: 500; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25); padding: 10px 25px !important; letter-spacing: 0.5px; }
 
+      /* Quarter Cards */
       .quarter-card {
         background: rgba(255, 255, 255, 0.5);
         border: 1px solid rgba(255, 255, 255, 0.9);
@@ -56,6 +67,7 @@
         flex-direction: column;
         justify-content: space-between;
         box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        cursor: pointer; position: relative;
       }
       .quarter-card:hover {
         background: rgba(255, 255, 255, 0.85);
@@ -65,6 +77,8 @@
       .q-title { font-size: 1rem; font-weight: 700; color: #64748b; margin-bottom: 5px; }
       .q-value { font-size: 1.4rem; font-weight: 800; color: #1e3a8a; margin-bottom: 8px; }
       .q-note { font-size: 0.75rem; color: #ea580c; font-weight: 600; background: rgba(234, 88, 12, 0.1); border-radius: 20px; padding: 4px 10px; display: inline-block; margin: 0 auto; }
+      .q-click-hint { font-size: 0.75rem; color: #3b82f6; font-weight: 600; opacity: 0; transition: all 0.3s ease; margin-top: 8px; }
+      .quarter-card:hover .q-click-hint { opacity: 1; transform: translateY(-2px); }
 
       .lottie-container { position: relative; width: 100%; display: flex; justify-content: flex-end; align-items: center; }
       .lottie-glow { position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0; }
@@ -81,7 +95,41 @@
       .pr-label { font-size: 0.85rem; color: #94a3b8; font-weight: 600; margin-bottom: 0.2rem; }
       .pr-value { font-size: 2.2rem; font-weight: 800; line-height: 1.2; }
       .loading-state { opacity: 0.5; pointer-events: none; filter: grayscale(20%); }
+
+      .btn-archive { background: rgba(255, 255, 255, 0.8); color: #475569; padding: 12px 28px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s ease; border: 1px solid rgba(226, 232, 240, 0.8); display: inline-flex; align-items: center; gap: 8px; }
+      .btn-archive:hover { background: #ffffff; color: #1e3a8a; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(30, 58, 138, 0.1); border-color: #cbd5e1; }
+
+      /* 🎯 Premium Modal UI (เพิ่มเข้ามาใหม่) */
+      .modal-premium .modal-content { border: none; border-radius: 28px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden; }
+      .modal-premium .modal-header { background: linear-gradient(to right, #f8fafc, #f1f5f9); border-bottom: 1px solid #e2e8f0; padding: 24px 32px; }
+      .modal-premium .modal-body { padding: 32px; background-color: #ffffff; }
       
+      .stat-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 24px; padding: 24px; display: flex; align-items: center; gap: 20px; transition: all 0.3s; height: 100%; overflow: hidden;}
+      .stat-box:hover { transform: translateY(-4px); box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.05); background: #ffffff; border-color: #cbd5e1;}
+      .stat-icon { width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;}
+      .stat-icon.blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+      .stat-icon.green { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+      .stat-info { flex: 1; min-width: 0; }
+      .stat-info .label { font-size: 0.9rem; color: #64748b; font-weight: 600; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0; white-space: normal; line-height: 1.3;}
+      .stat-info .value { font-size: clamp(1.4rem, 3vw + 0.5rem, 2rem); font-weight: 800; line-height: 1.1; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px; }
+      .stat-info .unit { font-size: 0.95rem; font-weight: 600; color: #94a3b8; }
+
+      .cat-item-modern { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); height: 100%;}
+      .cat-item-modern:hover { border-color: #cbd5e1; box-shadow: 0 8px 16px rgba(0,0,0,0.04); transform: translateY(-2px); }
+      .cat-item-modern .cat-name { font-weight: 600; color: #334155; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; flex: 1; min-width: 0; margin-right: 12px; }
+      .cat-item-badge { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); white-space: nowrap;}
+
+      .modern-table-container { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+      .modern-table { width: 100%; border-collapse: collapse; margin-bottom: 0;}
+      .modern-table th { background: #f8fafc; color: #64748b; font-weight: 700; font-size: 0.85rem; padding: 16px 24px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; }
+      .modern-table td { padding: 18px 24px; vertical-align: middle; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 1rem; }
+      .modern-table tr:last-child td { border-bottom: none; }
+      .modern-table tbody tr { transition: background-color 0.2s;}
+      .modern-table tbody tr:hover { background-color: #f8fafc; }
+      .month-badge { background: #f1f5f9; color: #475569; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.95rem; border: 1px solid #e2e8f0; display: inline-block;}
+      
+      .section-title { font-size: 1.15rem; font-weight: 800; color: #1e293b; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+
       @media (max-width: 768px) {
          .container { padding-left: 20px !important; padding-right: 20px !important; }
          .main-title { font-size: 2.5rem; }
@@ -97,6 +145,16 @@
          .q-title { font-size: 0.5rem; margin-bottom: 2px; }
          .q-value { font-size: 1.1rem; letter-spacing: -0.5px; margin-bottom: 5px; } 
          .q-note { font-size: 0.7rem; padding: 3px 8px; }
+         
+         /* 🎯 Responsive Fixes for Modal (ปรับปรุงใหม่ให้ยืดหยุ่น) */
+         .stat-box { padding: 20px 16px; gap: 16px; }
+         .stat-icon { width: 56px; height: 56px; }
+         .stat-info .label { font-size: 0.8rem; }
+         .stat-info .value { font-size: 1.6rem; }
+         
+         .cat-item-modern { padding: 12px 16px; }
+         .modal-premium .modal-body { padding: 20px 16px; }
+         .modal-premium .modal-header { padding: 20px 16px; }
       }
     </style>
   </head>
@@ -104,10 +162,9 @@
     <div class="container py-5 px-3">
       
       <div class="text-center mb-4 fade-in-up" style="animation-delay: 0.1s;">
-        <!-- 🎯 ปรับโลโก้ให้อยู่ในวงกลมสีขาว และจัดวางไว้ด้านบน -->
-        <div class="mx-auto mb-4" style="width: 140px; height: 140px; background-color: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 30px rgba(47, 60, 90, 0.08); border: 4px solid rgba(255,255,255,0.8);">
-          <img src="https://s.imgz.io/2026/10/30/cra-prfe57217485806239.png" alt="CRA Logo" style="height: 85px; width: auto; object-fit: contain;">
-        </div>
+        <div class="logo-container">
+          <img src="https://s.imgz.io/2026/10/30/cra-prfe57217485806239.png" alt="CRA Logo" />
+        </div><br>
         <h2 class="main-title">CRA News Dashboard 2027</h2>
         <p class="main-subtitle">ระบบรายงานสรุปผลการประชาสัมพันธ์ ฝ่ายสื่อสารองค์กร ราชวิทยาลัยจุฬาภรณ์</p>
       </div>
@@ -131,7 +188,6 @@
             <div class="col-lg-6 d-flex">
                <div class="lottie-container">
                  <div class="lottie-glow"></div>
-                 <!-- 🎯 เปลี่ยนลิงก์ Lottie Animation ตามที่คุณต้องการ -->
                  <lottie-player src="https://lottie.host/a7987db1-2686-46d4-9de2-836d38bc5194/vVOsSAO2SA.json" background="transparent" speed="1" style="width: 100%; max-width: 450px; height: auto;" loop autoplay></lottie-player>
                </div>
             </div>
@@ -140,47 +196,51 @@
           <div class="row g-3 pt-3 mt-2 border-top" style="border-color: rgba(255,255,255,0.4) !important; position: relative; z-index: 2;">
             
             <div class="col-6 col-lg-3">
-              <div class="quarter-card">
+              <div class="quarter-card" onclick="showQuarterModal(1)">
                 <div>
                   <div class="q-title">ไตรมาส 1</div>
                   <div class="q-value">฿<span id="q1Pr">0</span></div>
                 </div>
                 <div class="q-note"><i class="bi bi-award-fill"></i> พระกรณียกิจ <span id="q1Special">0</span> ข่าว</div>
+                <div class="q-click-hint"><i class="bi bi-hand-index-thumb me-1"></i>คลิกดูรายละเอียด</div>
               </div>
             </div>
 
             <div class="col-6 col-lg-3">
-              <div class="quarter-card">
+              <div class="quarter-card" onclick="showQuarterModal(2)">
                 <div>
                   <div class="q-title">ไตรมาส 2</div>
                   <div class="q-value">฿<span id="q2Pr">0</span></div>
                 </div>
                 <div class="q-note"><i class="bi bi-award-fill"></i> พระกรณียกิจ <span id="q2Special">0</span> ข่าว</div>
+                <div class="q-click-hint"><i class="bi bi-hand-index-thumb me-1"></i>คลิกดูรายละเอียด</div>
               </div>
             </div>
 
             <div class="col-6 col-lg-3">
-              <div class="quarter-card">
+              <div class="quarter-card" onclick="showQuarterModal(3)">
                 <div>
                   <div class="q-title">ไตรมาส 3</div>
                   <div class="q-value">฿<span id="q3Pr">0</span></div>
                 </div>
                 <div class="q-note"><i class="bi bi-award-fill"></i> พระกรณียกิจ <span id="q3Special">0</span> ข่าว</div>
+                <div class="q-click-hint"><i class="bi bi-hand-index-thumb me-1"></i>คลิกดูรายละเอียด</div>
               </div>
             </div>
 
             <div class="col-6 col-lg-3">
-              <div class="quarter-card">
+              <div class="quarter-card" onclick="showQuarterModal(4)">
                 <div>
                   <div class="q-title">ไตรมาส 4</div>
                   <div class="q-value">฿<span id="q4Pr">0</span></div>
                 </div>
                 <div class="q-note"><i class="bi bi-award-fill"></i> พระกรณียกิจ <span id="q4Special">0</span> ข่าว</div>
+                <div class="q-click-hint"><i class="bi bi-hand-index-thumb me-1"></i>คลิกดูรายละเอียด</div>
               </div>
             </div>
 
           </div>
-          </div>
+        </div>
       </div>
 
       <div class="row g-4 mb-4">
@@ -218,21 +278,83 @@
         </div>
       </div>
 
-      <!-- 🎯 ย้ายปุ่มดูข้อมูลย้อนหลังปี 2026 มาไว้ด้านล่างสุด (ก่อนเครดิต) -->
-      <div class="text-center mb-4 fade-in-up" style="animation-delay: 0.55s;">
-        <a href="https://educationcra.github.io/CRA.NewsDashboard2026/" target="_blank" class="btn btn-light rounded-pill px-4 shadow-sm" style="color: #475569; font-weight: 600; font-size: 0.95rem; border: 1px solid #cbd5e1; transition: all 0.3s ease; background-color: #ffffff;">
-          <i class="bi bi-clock-history me-2"></i>ดูข้อมูลย้อนหลังปี 2026
+      <div class="text-center mb-5 fade-in-up" style="animation-delay: 0.6s;">
+        <a href="https://educationcra.github.io/CRA.NewsDashboard2026/" target="_blank" class="btn-archive">
+          <i class="bi bi-clock-history"></i> ดูข้อมูลย้อนหลังปี 2026
         </a>
       </div>
 
-      <div class="text-center small pb-4 fade-in-up" style="animation-delay: 0.6s; color: #94a3b8; font-weight: 500;">
+      <div class="text-center small pb-4 fade-in-up" style="animation-delay: 0.7s; color: #94a3b8; font-weight: 500;">
         งานประชาสัมพันธ์ ฝ่ายสื่อสารองค์กร<br>Chulabhorn Royal Academy © 2027
       </div>
     </div>
 
+    <!-- 🎯 Quarter Modal (ดีไซน์ใหม่ทั้งหมด) -->
+    <div class="modal fade modal-premium" id="quarterDetailModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header align-items-center">
+            <h4 class="modal-title fw-bold d-flex align-items-center m-0" style="color: #1e293b;" id="qModalTitle">
+               <!-- JS จะใส่ Icon และชื่อไตรมาสที่นี่ -->
+            </h4>
+            <button type="button" class="btn-close shadow-none m-0" data-bs-dismiss="modal" aria-label="Close" style="background-color: #e2e8f0; border-radius: 50%; padding: 10px;"></button>
+          </div>
+          <div class="modal-body">
+            
+            <div class="row g-4 mb-5">
+               <div class="col-12 col-lg-6">
+                  <div class="stat-box">
+                     <div class="stat-icon blue">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                     </div>
+                     <div class="stat-info">
+                        <div class="label">จำนวนข่าวรวมไตรมาสนี้</div>
+                        <div class="value text-primary" id="qModalTotalCount">0</div>
+                     </div>
+                  </div>
+               </div>
+               <div class="col-12 col-lg-6">
+                  <div class="stat-box">
+                     <div class="stat-icon green">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                     </div>
+                     <div class="stat-info">
+                        <div class="label">ยอด PR Value รวม</div>
+                        <div class="value text-success" id="qModalTotalPr">0</div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            <h5 class="section-title">
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+               สัดส่วนตามหมวดหมู่ (รวม 3 แพลตฟอร์ม)
+            </h5>
+            <div class="row g-3 mb-5" id="qModalCategories"></div>
+
+            <h5 class="section-title">
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+               สรุปสถิติรายเดือนในไตรมาส
+            </h5>
+            <div class="modern-table-container table-responsive">
+              <table class="modern-table text-center align-middle">
+                <thead>
+                  <tr><th class="text-start ps-4">เดือน</th><th>จำนวนข่าว</th><th class="text-end pe-4">PR Value</th></tr>
+                </thead>
+                <tbody id="qModalMonths"></tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       const API_URL = "https://script.google.com/macros/s/AKfycbwqN-9Yhsu9me5F3UxBCiG9HaRSQpxPuRpkHeQOt7KwB6u_0H_wx63nozGCAg7GOJ_L-Q/exec";
+      window.dashboardData = null; 
       
       function animateValue(id, start, end, duration, suffix = '') {
         const obj = document.getElementById(id); let startTimestamp = null;
@@ -252,18 +374,18 @@
           .then(response => response.json())
           .then(data => {
             if(data.error) throw new Error(data.error);
+            window.dashboardData = data; 
+            
             let total = data.media + data.tv + data.radio;
             $('#totalPrMain').empty(); $('#prMedia').empty(); $('#prTv').empty(); $('#prRadio').empty();
             let bhtMain = '<span class="total-unit">บาท</span>';
             let bhtCard = '<span style="font-size: 1.3rem; color: #94a3b8; font-weight: 500; margin-left: 4px;">฿</span>';
             
-            // 🎯 ปรับความเร็วตัวเลขวิ่งให้เสร็จไวขึ้น (จาก 1500ms เหลือ 600ms)
             animateValue("totalPrMain", 0, total, 600, bhtMain);
             animateValue("prMedia", 0, data.media, 600, bhtCard);
             animateValue("prTv", 0, data.tv, 600, bhtCard);
             animateValue("prRadio", 0, data.radio, 600, bhtCard);
             
-            // 🎯 แอนิเมชันสำหรับ 4 กล่องไตรมาส
             if(data.quarters) {
               [1, 2, 3, 4].forEach(q => {
                 animateValue(`q${q}Pr`, 0, data.quarters[q].pr, 600, '');
@@ -279,6 +401,61 @@
             $('.nav-card').removeClass('loading-state');
           });
       });
+
+      function showQuarterModal(qIndex) {
+        if(!window.dashboardData || !window.dashboardData.quarters) return;
+        const qData = window.dashboardData.quarters[qIndex];
+        if(!qData) return;
+
+        // 🎯 ใส่ SVG กราฟแท่งสีส้ม บน Header
+        $('#qModalTitle').html(`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> ข้อมูลเชิงลึก ไตรมาสที่ ${qIndex}`);
+        
+        // 🎯 จัดฟอร์แมตตัวเลขพร้อมหน่วย
+        $('#qModalTotalCount').html(`<span>${qData.total.toLocaleString('th-TH')}</span> <span class="unit">ข่าว</span>`);
+        $('#qModalTotalPr').html(`<span>${qData.pr.toLocaleString('th-TH', {maximumFractionDigits:0})}</span> <span class="unit">บาท</span>`);
+        
+        let cats = Object.entries(qData.categories).sort((a,b) => b[1] - a[1]);
+        if (cats.length > 0) {
+          // 🎯 ใช้ดีไซน์การ์ดหมวดหมู่แบบใหม่ (แก้ไข Responsive)
+          let catHtml = cats.map(c => `
+            <div class="col-12 col-lg-6">
+                <div class="cat-item-modern">
+                    <div class="cat-name">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <span class="text-truncate" title="${c[0]}">${c[0]}</span>
+                    </div>
+                    <div class="cat-item-badge">${c[1]} ข่าว</div>
+                </div>
+            </div>
+          `).join('');
+          $('#qModalCategories').html(catHtml);
+        } else {
+          $('#qModalCategories').html('<div class="col-12 text-center text-muted py-4 bg-white rounded-4 border">ไม่มีข้อมูลหมวดหมู่ในไตรมาสนี้</div>');
+        }
+
+        let monthsHtml = '';
+        for (let mKey in qData.months) {
+          let mData = qData.months[mKey];
+          // 🎯 ใช้ดีไซน์ตารางแบบใหม่ พร้อมใส่หน่วย
+          monthsHtml += `
+            <tr>
+              <td class="fw-bold text-start ps-4">
+                 <div class="d-flex align-items-center gap-2" style="color: #475569;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    ${mData.name}
+                 </div>
+              </td>
+              <td class="text-center"><span class="month-badge">${mData.count} ข่าว</span></td>
+              <td class="fw-bold text-success text-end pe-4" style="font-size: 1.15rem;">${mData.pr.toLocaleString('th-TH', {maximumFractionDigits:0})} <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 600; margin-left: 2px;">บาท</span></td>
+            </tr>
+          `;
+        }
+        $('#qModalMonths').html(monthsHtml);
+        
+        let modalEl = document.getElementById('quarterDetailModal');
+        let modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.show();
+      }
     </script>
   </body>
 </html>
