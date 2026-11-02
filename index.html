@@ -302,25 +302,53 @@
           <div class="modal-body">
             
             <div class="row g-4 mb-5">
-               <div class="col-12 col-lg-6">
-                  <div class="stat-box">
-                     <div class="stat-icon blue">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+               <!-- 🎯 ฝั่งซ้าย: กล่องข่าวรวม + สับเซต (ข่าวองค์กร / ข่าวพระกรณียกิจ) -->
+               <div class="col-12 col-lg-7">
+                  <div class="stat-box flex-column align-items-stretch" style="gap: 16px;">
+                     <!-- ส่วนหัวข่าวรวม -->
+                     <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon blue">
+                           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        </div>
+                        <div class="stat-info">
+                           <div class="label">ข่าวรวมไตรมาสนี้</div>
+                           <div class="value text-primary" id="qModalTotalCount">0</div>
+                        </div>
                      </div>
-                     <div class="stat-info">
-                        <div class="label">จำนวนข่าวรวมไตรมาสนี้</div>
-                        <div class="value text-primary" id="qModalTotalCount">0</div>
+                     
+                     <!-- ส่วนย่อย (Subset): ข่าวองค์กร & พระกรณียกิจ -->
+                     <div class="row g-2 mt-1">
+                        <div class="col-6">
+                           <div class="bg-white border rounded-4 p-2 p-sm-3 d-flex align-items-center gap-2 h-100" style="box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                              <div class="d-none d-sm-flex" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border-radius: 12px; width: 36px; height: 36px; align-items: center; justify-content: center;"><i class="bi bi-building"></i></div>
+                              <div>
+                                 <div style="font-size: 0.75rem; color: #10b981; font-weight: 600;">ข่าวองค์กร</div>
+                                 <div class="fw-bold" style="color: #10b981; font-size: 1.15rem; line-height: 1.2;" id="qModalOrgCount">0 <span style="font-size: 0.75rem; font-weight: normal;">ข่าว</span></div>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-6">
+                           <div class="bg-white border rounded-4 p-2 p-sm-3 d-flex align-items-center gap-2 h-100" style="box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                              <div class="d-none d-sm-flex" style="background: rgba(234, 88, 12, 0.1); color: #ea580c; border-radius: 12px; width: 36px; height: 36px; align-items: center; justify-content: center;"><i class="bi bi-award"></i></div>
+                              <div>
+                                 <div style="font-size: 0.75rem; color: #ea580c; font-weight: 600;">ข่าวพระกรณียกิจ</div>
+                                 <div class="fw-bold" style="color: #ea580c; font-size: 1.15rem; line-height: 1.2;" id="qModalSpecialCountSubset">0 <span style="font-size: 0.75rem; font-weight: normal;">ข่าว</span></div>
+                              </div>
+                           </div>
+                        </div>
                      </div>
                   </div>
                </div>
-               <div class="col-12 col-lg-6">
-                  <div class="stat-box">
-                     <div class="stat-icon green">
+               
+               <!-- 🎯 ฝั่งขวา: ยอด PR Value รวม (ปรับให้สีสดใสขึ้น) -->
+               <div class="col-12 col-lg-5">
+                  <div class="stat-box h-100 align-items-center">
+                     <div class="stat-icon" style="background: rgba(99, 102, 241, 0.15); color: #6366f1;">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                      </div>
                      <div class="stat-info">
-                        <div class="label">ยอด PR Value รวม</div>
-                        <div class="value text-success" id="qModalTotalPr">0</div>
+                        <div class="label">PR Value รวม</div>
+                        <div class="value" style="color: #6366f1;" id="qModalTotalPr">0</div>
                      </div>
                   </div>
                </div>
@@ -412,6 +440,12 @@
         
         // 🎯 จัดฟอร์แมตตัวเลขพร้อมหน่วย
         $('#qModalTotalCount').html(`<span>${qData.total.toLocaleString('th-TH')}</span> <span class="unit">ข่าว</span>`);
+        
+        // คำนวณข่าวองค์กร (ข่าวทั้งหมด ลบ ข่าวพระกรณียกิจ)
+        let orgCount = qData.total - qData.special;
+        $('#qModalOrgCount').html(`${orgCount.toLocaleString('th-TH')} <span style="font-size: 0.8rem; font-weight: normal; color: #10b981;">ข่าว</span>`);
+        $('#qModalSpecialCountSubset').html(`${qData.special.toLocaleString('th-TH')} <span style="font-size: 0.8rem; font-weight: normal; color: #ea580c;">ข่าว</span>`);
+        
         $('#qModalTotalPr').html(`<span>${qData.pr.toLocaleString('th-TH', {maximumFractionDigits:0})}</span> <span class="unit">บาท</span>`);
         
         let cats = Object.entries(qData.categories).sort((a,b) => b[1] - a[1]);
@@ -441,12 +475,12 @@
             <tr>
               <td class="fw-bold text-start ps-4">
                  <div class="d-flex align-items-center gap-2" style="color: #475569;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                     ${mData.name}
                  </div>
               </td>
               <td class="text-center"><span class="month-badge">${mData.count} ข่าว</span></td>
-              <td class="fw-bold text-success text-end pe-4" style="font-size: 1.15rem;">${mData.pr.toLocaleString('th-TH', {maximumFractionDigits:0})} <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 600; margin-left: 2px;">บาท</span></td>
+              <td class="fw-bold text-end pe-4" style="font-size: 1.15rem; color: #6366f1;">${mData.pr.toLocaleString('th-TH', {maximumFractionDigits:0})} <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 600; margin-left: 2px;">บาท</span></td>
             </tr>
           `;
         }
